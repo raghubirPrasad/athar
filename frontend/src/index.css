@@ -1,0 +1,157 @@
+@import "tailwindcss";
+
+/*
+ * Design tokens. Calm, dense, audit-tool palette: neutral greys, one accent
+ * (deep teal) and four severity tones. Severity tones are never the only
+ * carrier of meaning — every SeverityBadge also has a text label and a glyph.
+ * Light by default; dark follows prefers-color-scheme.
+ */
+:root {
+  color-scheme: light dark;
+
+  --bg: #f6f7f8;
+  --surface: #ffffff;
+  --surface-muted: #f1f3f4;
+  --border: #d9dee3;
+  --border-strong: #b9c2c9;
+  --fg: #1a1f24;
+  --fg-muted: #5b6770;
+  --fg-faint: #666f78;  /* 4.6:1 on --surface-muted, 5.1:1 on --surface (WCAG AA) */
+
+  --accent: #0f766e;
+  --accent-strong: #115e59;
+  --accent-soft: #e6f4f2;
+  --accent-fg: #ffffff;
+
+  --sev-critical: #b42318;
+  --sev-critical-soft: #fde8e6;
+  --sev-high: #b54708;
+  --sev-high-soft: #fdeedd;
+  --sev-medium: #8a6a00;
+  --sev-medium-soft: #fbf3d0;
+  --sev-low: #175cd3;
+  --sev-low-soft: #e3edfb;
+
+  --ok: #067647;
+  --ok-soft: #e3f5ec;
+  --warn: #8a6a00;
+  --warn-soft: #fbf3d0;
+  --danger: #b42318;
+  --danger-soft: #fde8e6;
+  --danger-solid: #b42318;
+
+  --focus: #0f766e;
+  --shadow: 0 1px 2px rgb(16 24 40 / 0.06), 0 1px 3px rgb(16 24 40 / 0.1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #101417;
+    --surface: #171c21;
+    --surface-muted: #1f262c;
+    --border: #2b343c;
+    --border-strong: #3d4952;
+    --fg: #e6eaee;
+    --fg-muted: #9aa6b0;
+    --fg-faint: #85909a;  /* 4.7:1 on --surface-muted, 5.3:1 on --surface (WCAG AA) */
+
+    --accent: #2dd4bf;
+    --accent-strong: #5eead4;
+    --accent-soft: #113b38;
+    --accent-fg: #06211f;
+
+    --sev-critical: #f97066;
+    --sev-critical-soft: #3a1512;
+    --sev-high: #fdb022;
+    --sev-high-soft: #3b230a;
+    --sev-medium: #fde047;
+    --sev-medium-soft: #332c0a;
+    --sev-low: #84adff;
+    --sev-low-soft: #132548;
+
+    --ok: #4ade80;
+    --ok-soft: #0f2e1d;
+    --warn: #fde047;
+    --warn-soft: #332c0a;
+    --danger: #f97066;
+    --danger-soft: #3a1512;
+    --danger-solid: #d92d20;
+
+    --focus: #2dd4bf;
+    --shadow: 0 1px 2px rgb(0 0 0 / 0.4);
+  }
+}
+
+/* Expose the tokens to Tailwind utilities (bg-surface, text-fg-muted, border-border …). */
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-fg: var(--fg);
+  --color-fg-muted: var(--fg-muted);
+  --color-fg-faint: var(--fg-faint);
+  --color-accent: var(--accent);
+  --color-accent-strong: var(--accent-strong);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-fg: var(--accent-fg);
+  --color-sev-critical: var(--sev-critical);
+  --color-sev-critical-soft: var(--sev-critical-soft);
+  --color-sev-high: var(--sev-high);
+  --color-sev-high-soft: var(--sev-high-soft);
+  --color-sev-medium: var(--sev-medium);
+  --color-sev-medium-soft: var(--sev-medium-soft);
+  --color-sev-low: var(--sev-low);
+  --color-sev-low-soft: var(--sev-low-soft);
+  --color-ok: var(--ok);
+  --color-ok-soft: var(--ok-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-danger-solid: var(--danger-solid);
+  --color-focus: var(--focus);
+
+  --font-sans:
+    ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial,
+    "Noto Sans", sans-serif;
+  --font-mono:
+    ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+@layer base {
+  html {
+    font-size: 14px;
+    font-family: var(--font-sans);
+    background: var(--bg);
+    color: var(--fg);
+    -webkit-font-smoothing: antialiased;
+  }
+  body {
+    margin: 0;
+    min-height: 100vh;
+  }
+  :focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+  ::selection {
+    background: var(--accent-soft);
+  }
+  code,
+  kbd,
+  pre {
+    font-family: var(--font-mono);
+    font-size: 0.925em;
+  }
+}
+
+@layer utilities {
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+  .shadow-card {
+    box-shadow: var(--shadow);
+  }
+}

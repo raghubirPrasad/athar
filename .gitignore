@@ -1,0 +1,38 @@
+# secrets / env
+.env
+.env.*
+!.env.example
+
+# generated estate — never committed, including the CI samples: the generator is
+# deterministic and rebuilds a 6-month / 120-identity estate in about a second
+# (`athar eval --sample <seed>`), so committing 5 MB of it would buy nothing.
+data/
+
+
+# python
+__pycache__/
+*.py[cod]
+.venv/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.hypothesis/
+*.egg-info/
+backend/eval/results-*.json
+backend/athar/eval/results-*.json
+
+# node
+node_modules/
+frontend/dist/
+frontend/.vite/
+
+# foundry — contracts/lib IS committed (no submodules), so `forge build` works on a clean clone
+/lib/
+contracts/out/
+contracts/cache/
+contracts/broadcast/
+
+# os / editor
+.DS_Store
+.idea/
+.vscode/

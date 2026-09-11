@@ -1,0 +1,13 @@
+{
+  "bindings": [
+    {"role": "roles/owner", "members": ["user:fatima.saeed@nda.example"]},
+    {"role": "roles/editor", "members": ["user:omar.haddad@nda.example"]},
+    {"role": "roles/iam.serviceAccountUser", "members": ["serviceAccount:etl@nda-analytics-prod.iam.gserviceaccount.com"]},
+    {"role": "roles/bigquery.dataViewer", "members": ["user:aisha.almansoori@nda.example", "group:analysts@nda.example"]},
+    {"role": "roles/storage.objectAdmin", "members": ["serviceAccount:orphan-sa@nda-analytics-prod.iam.gserviceaccount.com"]},
+    {"role": "roles/customVendorRole", "members": ["user:omar.haddad@nda.example"]},
+    {"role": "roles/spanner.databaseAdmin", "members": ["user:omar.haddad@nda.example"]}
+  ],
+  "etag": "BwYExampleEtag=",
+  "version": 1
+}

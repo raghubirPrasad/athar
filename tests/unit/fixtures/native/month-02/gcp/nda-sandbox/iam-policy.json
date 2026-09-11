@@ -1,0 +1,8 @@
+{
+  "bindings": [
+    {"role": "roles/owner", "members": ["user:omar.haddad@nda.example"]},
+    {"role": "roles/storage.admin", "members": ["serviceAccount:etl@nda-analytics-prod.iam.gserviceaccount.com"]}
+  ],
+  "etag": "BwYExampleEtag2=",
+  "version": 1
+}

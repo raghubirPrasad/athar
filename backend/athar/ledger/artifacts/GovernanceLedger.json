@@ -1,0 +1,559 @@
+{
+ "abi": [
+  {
+   "inputs": [
+    {
+     "internalType": "address",
+     "name": "admin",
+     "type": "address"
+    }
+   ],
+   "stateMutability": "nonpayable",
+   "type": "constructor"
+  },
+  {
+   "inputs": [],
+   "name": "DECIDER_ROLE",
+   "outputs": [
+    {
+     "internalType": "bytes32",
+     "name": "",
+     "type": "bytes32"
+    }
+   ],
+   "stateMutability": "view",
+   "type": "function"
+  },
+  {
+   "inputs": [],
+   "name": "DEFAULT_ADMIN_ROLE",
+   "outputs": [
+    {
+     "internalType": "bytes32",
+     "name": "",
+     "type": "bytes32"
+    }
+   ],
+   "stateMutability": "view",
+   "type": "function"
+  },
+  {
+   "inputs": [],
+   "name": "MAX_DECISION",
+   "outputs": [
+    {
+     "internalType": "uint8",
+     "name": "",
+     "type": "uint8"
+    }
+   ],
+   "stateMutability": "view",
+   "type": "function"
+  },
+  {
+   "inputs": [],
+   "name": "MIN_DECISION",
+   "outputs": [
+    {
+     "internalType": "uint8",
+     "name": "",
+     "type": "uint8"
+    }
+   ],
+   "stateMutability": "view",
+   "type": "function"
+  },
+  {
+   "inputs": [],
+   "name": "SCANNER_ROLE",
+   "outputs": [
+    {
+     "internalType": "bytes32",
+     "name": "",
+     "type": "bytes32"
+    }
+   ],
+   "stateMutability": "view",
+   "type": "function"
+  },
+  {
+   "inputs": [],
+   "name": "commitCount",
+   "outputs": [
+    {
+     "internalType": "uint256",
+     "name": "",
+     "type": "uint256"
+    }
+   ],
+   "stateMutability": "view",
+   "type": "function"
+  },
+  {
+   "inputs": [
+    {
+     "internalType": "bytes32",
+     "name": "snapshotHash",
+     "type": "bytes32"
+    },
+    {
+     "internalType": "bytes32",
+     "name": "findingsRoot",
+     "type": "bytes32"
+    },
+    {
+     "internalType": "bytes32",
+     "name": "rulesetHash",
+     "type": "bytes32"
+    },
+    {
+     "internalType": "uint32",
+     "name": "findingCount",
+     "type": "uint32"
+    }
+   ],
+   "name": "commitScan",
+   "outputs": [
+    {
+     "internalType": "uint256",
+     "name": "scanIndex",
+     "type": "uint256"
+    }
+   ],
+   "stateMutability": "nonpayable",
+   "type": "function"
+  },
+  {
+   "inputs": [
+    {
+     "internalType": "uint256",
+     "name": "scanIndex",
+     "type": "uint256"
+    }
+   ],
+   "name": "getCommit",
+   "outputs": [
+    {
+     "components": [
+      {
+       "internalType": "bytes32",
+       "name": "snapshotHash",
+       "type": "bytes32"
+      },
+      {
+       "internalType": "bytes32",
+       "name": "findingsRoot",
+       "type": "bytes32"
+      },
+      {
+       "internalType": "bytes32",
+       "name": "rulesetHash",
+       "type": "bytes32"
+      },
+      {
+       "internalType": "uint32",
+       "name": "findingCount",
+       "type": "uint32"
+      },
+      {
+       "internalType": "uint64",
+       "name": "timestamp",
+       "type": "uint64"
+      },
+      {
+       "internalType": "address",
+       "name": "submitter",
+       "type": "address"
+      }
+     ],
+     "internalType": "struct GovernanceLedger.ScanCommit",
+     "name": "",
+     "type": "tuple"
+    }
+   ],
+   "stateMutability": "view",
+   "type": "function"
+  },
+  {
+   "inputs": [
+    {
+     "internalType": "bytes32",
+     "name": "role",
+     "type": "bytes32"
+    }
+   ],
+   "name": "getRoleAdmin",
+   "outputs": [
+    {
+     "internalType": "bytes32",
+     "name": "",
+     "type": "bytes32"
+    }
+   ],
+   "stateMutability": "view",
+   "type": "function"
+  },
+  {
+   "inputs": [
+    {
+     "internalType": "bytes32",
+     "name": "role",
+     "type": "bytes32"
+    },
+    {
+     "internalType": "address",
+     "name": "account",
+     "type": "address"
+    }
+   ],
+   "name": "grantRole",
+   "outputs": [],
+   "stateMutability": "nonpayable",
+   "type": "function"
+  },
+  {
+   "inputs": [
+    {
+     "internalType": "bytes32",
+     "name": "role",
+     "type": "bytes32"
+    },
+    {
+     "internalType": "address",
+     "name": "account",
+     "type": "address"
+    }
+   ],
+   "name": "hasRole",
+   "outputs": [
+    {
+     "internalType": "bool",
+     "name": "",
+     "type": "bool"
+    }
+   ],
+   "stateMutability": "view",
+   "type": "function"
+  },
+  {
+   "inputs": [
+    {
+     "internalType": "uint256",
+     "name": "scanIndex",
+     "type": "uint256"
+    },
+    {
+     "internalType": "bytes32",
+     "name": "findingLeaf",
+     "type": "bytes32"
+    },
+    {
+     "internalType": "bytes32[]",
+     "name": "proof",
+     "type": "bytes32[]"
+    },
+    {
+     "internalType": "uint8",
+     "name": "decision",
+     "type": "uint8"
+    },
+    {
+     "internalType": "bytes32",
+     "name": "actorHash",
+     "type": "bytes32"
+    },
+    {
+     "internalType": "bytes32",
+     "name": "evidenceHash",
+     "type": "bytes32"
+    }
+   ],
+   "name": "recordDecision",
+   "outputs": [],
+   "stateMutability": "nonpayable",
+   "type": "function"
+  },
+  {
+   "inputs": [
+    {
+     "internalType": "bytes32",
+     "name": "role",
+     "type": "bytes32"
+    },
+    {
+     "internalType": "address",
+     "name": "callerConfirmation",
+     "type": "address"
+    }
+   ],
+   "name": "renounceRole",
+   "outputs": [],
+   "stateMutability": "nonpayable",
+   "type": "function"
+  },
+  {
+   "inputs": [
+    {
+     "internalType": "bytes32",
+     "name": "role",
+     "type": "bytes32"
+    },
+    {
+     "internalType": "address",
+     "name": "account",
+     "type": "address"
+    }
+   ],
+   "name": "revokeRole",
+   "outputs": [],
+   "stateMutability": "nonpayable",
+   "type": "function"
+  },
+  {
+   "inputs": [
+    {
+     "internalType": "bytes4",
+     "name": "interfaceId",
+     "type": "bytes4"
+    }
+   ],
+   "name": "supportsInterface",
+   "outputs": [
+    {
+     "internalType": "bool",
+     "name": "",
+     "type": "bool"
+    }
+   ],
+   "stateMutability": "view",
+   "type": "function"
+  },
+  {
+   "inputs": [
+    {
+     "internalType": "uint256",
+     "name": "scanIndex",
+     "type": "uint256"
+    },
+    {
+     "internalType": "bytes32",
+     "name": "findingLeaf",
+     "type": "bytes32"
+    },
+    {
+     "internalType": "bytes32[]",
+     "name": "proof",
+     "type": "bytes32[]"
+    }
+   ],
+   "name": "verifyFinding",
+   "outputs": [
+    {
+     "internalType": "bool",
+     "name": "",
+     "type": "bool"
+    }
+   ],
+   "stateMutability": "view",
+   "type": "function"
+  },
+  {
+   "anonymous": false,
+   "inputs": [
+    {
+     "indexed": true,
+     "internalType": "uint256",
+     "name": "scanIndex",
+     "type": "uint256"
+    },
+    {
+     "indexed": true,
+     "internalType": "bytes32",
+     "name": "findingLeaf",
+     "type": "bytes32"
+    },
+    {
+     "indexed": false,
+     "internalType": "uint8",
+     "name": "decision",
+     "type": "uint8"
+    },
+    {
+     "indexed": false,
+     "internalType": "bytes32",
+     "name": "actorHash",
+     "type": "bytes32"
+    },
+    {
+     "indexed": false,
+     "internalType": "bytes32",
+     "name": "evidenceHash",
+     "type": "bytes32"
+    },
+    {
+     "indexed": false,
+     "internalType": "uint64",
+     "name": "timestamp",
+     "type": "uint64"
+    }
+   ],
+   "name": "DecisionRecorded",
+   "type": "event"
+  },
+  {
+   "anonymous": false,
+   "inputs": [
+    {
+     "indexed": true,
+     "internalType": "bytes32",
+     "name": "role",
+     "type": "bytes32"
+    },
+    {
+     "indexed": true,
+     "internalType": "bytes32",
+     "name": "previousAdminRole",
+     "type": "bytes32"
+    },
+    {
+     "indexed": true,
+     "internalType": "bytes32",
+     "name": "newAdminRole",
+     "type": "bytes32"
+    }
+   ],
+   "name": "RoleAdminChanged",
+   "type": "event"
+  },
+  {
+   "anonymous": false,
+   "inputs": [
+    {
+     "indexed": true,
+     "internalType": "bytes32",
+     "name": "role",
+     "type": "bytes32"
+    },
+    {
+     "indexed": true,
+     "internalType": "address",
+     "name": "account",
+     "type": "address"
+    },
+    {
+     "indexed": true,
+     "internalType": "address",
+     "name": "sender",
+     "type": "address"
+    }
+   ],
+   "name": "RoleGranted",
+   "type": "event"
+  },
+  {
+   "anonymous": false,
+   "inputs": [
+    {
+     "indexed": true,
+     "internalType": "bytes32",
+     "name": "role",
+     "type": "bytes32"
+    },
+    {
+     "indexed": true,
+     "internalType": "address",
+     "name": "account",
+     "type": "address"
+    },
+    {
+     "indexed": true,
+     "internalType": "address",
+     "name": "sender",
+     "type": "address"
+    }
+   ],
+   "name": "RoleRevoked",
+   "type": "event"
+  },
+  {
+   "anonymous": false,
+   "inputs": [
+    {
+     "indexed": true,
+     "internalType": "uint256",
+     "name": "scanIndex",
+     "type": "uint256"
+    },
+    {
+     "indexed": false,
+     "internalType": "bytes32",
+     "name": "snapshotHash",
+     "type": "bytes32"
+    },
+    {
+     "indexed": false,
+     "internalType": "bytes32",
+     "name": "findingsRoot",
+     "type": "bytes32"
+    },
+    {
+     "indexed": false,
+     "internalType": "bytes32",
+     "name": "rulesetHash",
+     "type": "bytes32"
+    },
+    {
+     "indexed": false,
+     "internalType": "uint32",
+     "name": "findingCount",
+     "type": "uint32"
+    }
+   ],
+   "name": "ScanCommitted",
+   "type": "event"
+  },
+  {
+   "inputs": [],
+   "name": "AccessControlBadConfirmation",
+   "type": "error"
+  },
+  {
+   "inputs": [
+    {
+     "internalType": "address",
+     "name": "account",
+     "type": "address"
+    },
+    {
+     "internalType": "bytes32",
+     "name": "neededRole",
+     "type": "bytes32"
+    }
+   ],
+   "name": "AccessControlUnauthorizedAccount",
+   "type": "error"
+  },
+  {
+   "inputs": [],
+   "name": "InvalidDecision",
+   "type": "error"
+  },
+  {
+   "inputs": [],
+   "name": "InvalidProof",
+   "type": "error"
+  },
+  {
+   "inputs": [],
+   "name": "UnknownScan",
+   "type": "error"
+  }
+ ],
+ "bytecode": "0x608060405234801561000f575f80fd5b50604051610da3380380610da383398101604081905261002e9161013e565b6100385f82610095565b506100637fa9b81438e9053a522b683603c102f65503853bc7aa82f89a130662d957c081fb82610095565b5061008e7f2eff2814f3a5526a4595231a9870411ab69ab0ccc108065708b44d5fe7abf2b782610095565b505061016b565b5f828152602081815260408083206001600160a01b038516845290915281205460ff16610135575f838152602081815260408083206001600160a01b03861684529091529020805460ff191660011790556100ed3390565b6001600160a01b0316826001600160a01b0316847f2f8788117e7eff1d82e926ec794901d17c78024a50270940304540a733656f0d60405160405180910390a4506001610138565b505f5b92915050565b5f6020828403121561014e575f80fd5b81516001600160a01b0381168114610164575f80fd5b9392505050565b610c2b806101785f395ff3fe608060405234801561000f575f80fd5b50600436106100fb575f3560e01c806391d1485411610093578063c38980e111610063578063c38980e114610224578063c6dd0c2114610237578063d547741f1461024a578063fcdbb8af1461025d575f80fd5b806391d14854146101ef578063a217fddf14610202578063b38b42fb14610209578063bb1f161814610211575f80fd5b80632f2ff15d116100ce5780632f2ff15d146101a557806336568abe146101ba5780638a9684a8146101cd5780639123988b146101e7575f80fd5b806301ffc9a7146100ff5780630c073cb514610127578063248a9ca31461015c5780632e1606cf1461017e575b5f80fd5b61011261010d366004610a11565b6102d0565b60405190151581526020015b60405180910390f35b61014e7fa9b81438e9053a522b683603c102f65503853bc7aa82f89a130662d957c081fb81565b60405190815260200161011e565b61014e61016a366004610a38565b5f9081526020819052604090206001015490565b61014e7f2eff2814f3a5526a4595231a9870411ab69ab0ccc108065708b44d5fe7abf2b781565b6101b86101b3366004610a4f565b610306565b005b6101b86101c8366004610a4f565b610330565b6101d5600181565b60405160ff909116815260200161011e565b60015461014e565b6101126101fd366004610a4f565b610368565b61014e5f81565b6101d5600581565b61011261021f366004610ad0565b610390565b61014e610232366004610b1f565b61040e565b6101b8610245366004610b65565b6105e2565b6101b8610258366004610a4f565b610741565b61027061026b366004610a38565b610765565b60405161011e919081518152602080830151908201526040808301519082015260608083015163ffffffff169082015260808083015167ffffffffffffffff169082015260a0918201516001600160a01b03169181019190915260c00190565b5f6001600160e01b03198216637965db0b60e01b148061030057506301ffc9a760e01b6001600160e01b03198316145b92915050565b5f8281526020819052604090206001015461032081610845565b61032a8383610852565b50505050565b6001600160a01b03811633146103595760405163334bd91960e11b815260040160405180910390fd5b61036382826108e1565b505050565b5f918252602082815260408084206001600160a01b0393909316845291905290205460ff1690565b6001545f9085106103a257505f610406565b6104038383808060200260200160405190810160405280939291908181526020018383602002808284375f92019190915250506001805490925089915081106103ed576103ed610be1565b905f5260205f209060040201600101548661094a565b90505b949350505050565b5f7fa9b81438e9053a522b683603c102f65503853bc7aa82f89a130662d957c081fb61043981610845565b600180546040805160c0810182528981526020810189815281830189815263ffffffff808a166060850190815267ffffffffffffffff428116608087019081523360a08801908152898b018b555f9a909a529551600489027fb10e2d527612073b26eecdfd717e6a320cf44b4afac2b0732d9fcbe2b7fa0cf681019190915594517fb10e2d527612073b26eecdfd717e6a320cf44b4afac2b0732d9fcbe2b7fa0cf786015592517fb10e2d527612073b26eecdfd717e6a320cf44b4afac2b0732d9fcbe2b7fa0cf8850155517fb10e2d527612073b26eecdfd717e6a320cf44b4afac2b0732d9fcbe2b7fa0cf99093018054945197516001600160a01b0316600160601b026bffffffffffffffffffffffff98909316640100000000026bffffffffffffffffffffffff199095169390911692909217929092179490941617909255905190925082907f51940526be770c9cd7d2da9fe7e215958cf7073414e2e455cee9d8bc11e8da07906105d19089908990899089909384526020840192909252604083015263ffffffff16606082015260800190565b60405180910390a250949350505050565b7f2eff2814f3a5526a4595231a9870411ab69ab0ccc108065708b44d5fe7abf2b761060c81610845565b600154881061062e5760405163239bae7160e11b815260040160405180910390fd5b600160ff851610806106435750600560ff8516115b1561066157604051633081d32f60e21b815260040160405180910390fd5b6106c28686808060200260200160405190810160405280939291908181526020018383602002808284375f9201919091525050600180549092508c915081106106ac576106ac610be1565b905f5260205f209060040201600101548961094a565b6106df576040516309bde33960e01b815260040160405180910390fd5b6040805160ff861681526020810185905290810183905267ffffffffffffffff42166060820152879089907ff776d8231066d84ded6fb131976dff96b3c0152216792d2b61fa70c845831f069060800160405180910390a35050505050505050565b5f8281526020819052604090206001015461075b81610845565b61032a83836108e1565b6040805160c0810182525f80825260208201819052918101829052606081018290526080810182905260a081019190915260015482106107b85760405163239bae7160e11b815260040160405180910390fd5b600182815481106107cb576107cb610be1565b5f9182526020918290206040805160c08101825260049093029091018054835260018101549383019390935260028301549082015260039091015463ffffffff8116606083015267ffffffffffffffff64010000000082041660808301526001600160a01b03600160601b9091041660a082015292915050565b61084f813361095f565b50565b5f61085d8383610368565b6108da575f838152602081815260408083206001600160a01b03861684529091529020805460ff191660011790556108923390565b6001600160a01b0316826001600160a01b0316847f2f8788117e7eff1d82e926ec794901d17c78024a50270940304540a733656f0d60405160405180910390a4506001610300565b505f610300565b5f6108ec8383610368565b156108da575f838152602081815260408083206001600160a01b0386168085529252808320805460ff1916905551339286917ff6391f5c32d9c69d2a47ea670b442974b53935d1edc7fd64eb21e047a839171b9190a4506001610300565b5f8261095685846109a0565b14949350505050565b6109698282610368565b61099c5760405163e2517d3f60e01b81526001600160a01b03821660048201526024810183905260440160405180910390fd5b5050565b5f81815b84518110156109da576109d0828683815181106109c3576109c3610be1565b60200260200101516109e2565b91506001016109a4565b509392505050565b5f8183106109fc575f828152602084905260409020610a0a565b5f8381526020839052604090205b9392505050565b5f60208284031215610a21575f80fd5b81356001600160e01b031981168114610a0a575f80fd5b5f60208284031215610a48575f80fd5b5035919050565b5f8060408385031215610a60575f80fd5b8235915060208301356001600160a01b0381168114610a7d575f80fd5b809150509250929050565b5f8083601f840112610a98575f80fd5b50813567ffffffffffffffff811115610aaf575f80fd5b6020830191508360208260051b8501011115610ac9575f80fd5b9250929050565b5f805f8060608587031215610ae3575f80fd5b8435935060208501359250604085013567ffffffffffffffff811115610b07575f80fd5b610b1387828801610a88565b95989497509550505050565b5f805f8060808587031215610b32575f80fd5b843593506020850135925060408501359150606085013563ffffffff81168114610b5a575f80fd5b939692955090935050565b5f805f805f805f60c0888a031215610b7b575f80fd5b8735965060208801359550604088013567ffffffffffffffff811115610b9f575f80fd5b610bab8a828b01610a88565b909650945050606088013560ff81168114610bc4575f80fd5b969995985093969295946080840135945060a09093013592915050565b634e487b7160e01b5f52603260045260245ffdfea2646970667358221220f0fbfe4a42b66a3b38e66d091a4d611f29d85f397099320d8801f3068ff07ccd64736f6c63430008180033",
+ "contractName": "GovernanceLedger",
+ "metadata": {
+  "compiler": {
+   "version": "0.8.24+commit.e11b9ed9"
+  }
+ }
+}

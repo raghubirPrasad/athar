@@ -1,0 +1,278 @@
+# ATHAR provider mapping — Azure (SPEC §5.3). The ONLY place Azure RBAC actions and built-in
+# roles are mapped to canonical (service_category, verb) pairs. Every entry is exercised by
+# tests/unit/test_mappings_azure.py.
+#
+# Built-in role GUIDs are transcribed from the Azure built-in roles reference; SPEC §4.6 marks
+# them (verify). A role is matched by GUID first, then by name (case-insensitive).
+version: 1
+cloud: azure
+
+# Scope levels (SPEC §5.2): RG (and anything below it) → resource, subscription → project,
+# management group → org, "/" → global.
+scope_levels:
+  - {pattern: '^/$', level: global}
+  - {pattern: '^/providers/Microsoft\.Management/managementGroups/', level: org}
+  - {pattern: '^/subscriptions/[^/]+/?$', level: project}
+  - {pattern: '^/subscriptions/[^/]+/resourceGroups/', level: resource}
+  - {pattern: '^/subscriptions/[^/]+/providers/', level: resource}
+
+# Resource provider namespace → service_category (also used for activity-log-summary
+# `resourceProvider`, SPEC §5.3).
+services:
+  Microsoft.Storage: storage
+  Microsoft.DataLakeStore: storage
+  Microsoft.RecoveryServices: storage
+  Microsoft.Compute: compute
+  Microsoft.Web: compute
+  Microsoft.ContainerService: compute
+  Microsoft.ContainerInstance: compute
+  Microsoft.Resources: compute
+  Microsoft.Batch: compute
+  Microsoft.Network: network
+  Microsoft.Cdn: network
+  Microsoft.Authorization: identity
+  Microsoft.ManagedIdentity: identity
+  Microsoft.Management: identity
+  Microsoft.AAD: identity
+  microsoft.directory: identity
+  Microsoft.Subscription: identity
+  Microsoft.Sql: data
+  Microsoft.DocumentDB: data
+  Microsoft.DBforPostgreSQL: data
+  Microsoft.DBforMySQL: data
+  Microsoft.Synapse: data
+  Microsoft.DataFactory: data
+  Microsoft.EventHub: data
+  Microsoft.ServiceBus: data
+  Microsoft.Cache: data
+  Microsoft.KeyVault: security
+  Microsoft.Security: security
+  Microsoft.Insights: security
+  Microsoft.OperationalInsights: security
+  Microsoft.PolicyInsights: security
+  Microsoft.Support: security
+  Microsoft.Billing: billing
+  Microsoft.Consumption: billing
+  Microsoft.CostManagement: billing
+  Microsoft.Commerce: billing
+
+# Last path segment of an action → verb (generic rule for unlisted actions of a known provider).
+verb_suffixes:
+  read: read
+  write: write
+  delete: delete
+  action: write
+
+# Explicit actions (matched case-insensitively; entries containing "*" are fnmatch globs).
+actions:
+  - {action: "Microsoft.Authorization/roleAssignments/write", maps: ["identity:grant"]}
+  - {action: "Microsoft.Authorization/roleAssignments/delete", maps: ["identity:grant"]}
+  - {action: "Microsoft.Authorization/roleAssignments/read", maps: ["identity:read"]}
+  - {action: "Microsoft.Authorization/roleDefinitions/write", maps: ["identity:write"]}
+  - {action: "Microsoft.Authorization/roleDefinitions/delete", maps: ["identity:delete"]}
+  - {action: "Microsoft.Authorization/roleDefinitions/read", maps: ["identity:read"]}
+  - {action: "Microsoft.Authorization/elevateAccess/Action", maps: ["identity:grant"]}
+  - {action: "Microsoft.Authorization/policyAssignments/write", maps: ["security:admin"]}
+  - {action: "Microsoft.Authorization/policyAssignments/delete", maps: ["security:admin"]}
+  - {action: "Microsoft.Authorization/locks/write", maps: ["security:admin"]}
+  - {action: "Microsoft.Authorization/locks/delete", maps: ["security:admin"]}
+  - {action: "Microsoft.Authorization/*/read", maps: ["identity:read"]}
+  - action: "Microsoft.Authorization/*"
+    maps: ["identity:*"]
+    expect: ["identity:admin", "identity:grant", "identity:impersonate"]
+  - {action: "Microsoft.ManagedIdentity/userAssignedIdentities/assign/action", maps: ["identity:impersonate"]}
+  - {action: "Microsoft.ManagedIdentity/userAssignedIdentities/*/assign/action", maps: ["identity:impersonate"]}
+  - {action: "Microsoft.ManagedIdentity/userAssignedIdentities/write", maps: ["identity:write"]}
+  - {action: "Microsoft.ManagedIdentity/userAssignedIdentities/delete", maps: ["identity:delete"]}
+  - {action: "Microsoft.ManagedIdentity/userAssignedIdentities/read", maps: ["identity:read"]}
+  - {action: "Microsoft.ManagedIdentity/userAssignedIdentities/federatedIdentityCredentials/write", maps: ["identity:grant"]}
+  - action: "Microsoft.Storage/*"
+    maps: ["storage:*"]
+    expect: ["storage:read", "storage:write", "storage:delete", "storage:admin"]
+  - {action: "Microsoft.Storage/storageAccounts/read", maps: ["storage:read"]}
+  - {action: "Microsoft.Storage/storageAccounts/write", maps: ["storage:write"]}
+  - {action: "Microsoft.Storage/storageAccounts/delete", maps: ["storage:delete"]}
+  - {action: "Microsoft.Storage/storageAccounts/listKeys/action", maps: ["storage:admin"]}
+  - {action: "Microsoft.Storage/storageAccounts/regenerateKey/action", maps: ["storage:admin"]}
+  - {action: "Microsoft.Storage/storageAccounts/blobServices/containers/read", maps: ["storage:read"]}
+  - {action: "Microsoft.Storage/storageAccounts/blobServices/containers/write", maps: ["storage:write"]}
+  - {action: "Microsoft.Storage/storageAccounts/blobServices/containers/delete", maps: ["storage:delete"]}
+  - {action: "Microsoft.Storage/storageAccounts/blobServices/containers/blobs/read", maps: ["storage:read"]}
+  - {action: "Microsoft.Storage/storageAccounts/blobServices/containers/blobs/write", maps: ["storage:write"]}
+  - {action: "Microsoft.Storage/storageAccounts/blobServices/containers/blobs/delete", maps: ["storage:delete"]}
+  - {action: "Microsoft.Storage/storageAccounts/blobServices/containers/blobs/manageOwnership/action", maps: ["storage:admin"]}
+  - action: "Microsoft.Compute/*"
+    maps: ["compute:*"]
+    expect: ["compute:read", "compute:write", "compute:delete", "compute:admin"]
+  - {action: "Microsoft.Compute/virtualMachines/read", maps: ["compute:read"]}
+  - {action: "Microsoft.Compute/virtualMachines/write", maps: ["compute:write"]}
+  - {action: "Microsoft.Compute/virtualMachines/delete", maps: ["compute:delete"]}
+  - {action: "Microsoft.Compute/virtualMachines/start/action", maps: ["compute:write"]}
+  - {action: "Microsoft.Compute/virtualMachines/restart/action", maps: ["compute:write"]}
+  - {action: "Microsoft.Compute/virtualMachines/deallocate/action", maps: ["compute:write"]}
+  - {action: "Microsoft.Compute/virtualMachines/runCommand/action", maps: ["compute:admin"]}
+  - {action: "Microsoft.Compute/disks/read", maps: ["compute:read"]}
+  - {action: "Microsoft.Compute/disks/write", maps: ["compute:write"]}
+  - {action: "Microsoft.Compute/disks/delete", maps: ["compute:delete"]}
+  - action: "Microsoft.Network/*"
+    maps: ["network:*"]
+    expect: ["network:read", "network:write", "network:delete", "network:admin"]
+  - {action: "Microsoft.Network/virtualNetworks/read", maps: ["network:read"]}
+  - {action: "Microsoft.Network/virtualNetworks/write", maps: ["network:write"]}
+  - {action: "Microsoft.Network/virtualNetworks/delete", maps: ["network:delete"]}
+  - {action: "Microsoft.Network/networkSecurityGroups/write", maps: ["network:write"]}
+  - {action: "Microsoft.Network/networkSecurityGroups/securityRules/write", maps: ["network:write"]}
+  - {action: "Microsoft.Network/networkInterfaces/join/action", maps: ["network:write"]}
+  - action: "Microsoft.Sql/*"
+    maps: ["data:*"]
+    expect: ["data:read", "data:write", "data:delete", "data:admin"]
+  - {action: "Microsoft.Sql/servers/databases/read", maps: ["data:read"]}
+  - {action: "Microsoft.Sql/servers/databases/write", maps: ["data:write"]}
+  - {action: "Microsoft.Sql/servers/databases/delete", maps: ["data:delete"]}
+  - {action: "Microsoft.Sql/servers/databases/export/action", maps: ["data:read"]}
+  - {action: "Microsoft.Sql/servers/databases/import/action", maps: ["data:write"]}
+  - {action: "Microsoft.Sql/servers/firewallRules/write", maps: ["data:admin"]}
+  - {action: "Microsoft.DocumentDB/databaseAccounts/listKeys/action", maps: ["data:admin"]}
+  - action: "Microsoft.KeyVault/*"
+    maps: ["security:*"]
+    expect: ["security:read", "security:write", "security:delete", "security:admin"]
+  - {action: "Microsoft.KeyVault/vaults/read", maps: ["security:read"]}
+  - {action: "Microsoft.KeyVault/vaults/write", maps: ["security:write"]}
+  - {action: "Microsoft.KeyVault/vaults/delete", maps: ["security:delete"]}
+  - {action: "Microsoft.KeyVault/vaults/accessPolicies/write", maps: ["security:admin"]}
+  - {action: "Microsoft.KeyVault/vaults/secrets/read", maps: ["security:read"]}
+  - {action: "Microsoft.KeyVault/vaults/secrets/getSecret/action", maps: ["security:read"]}
+  - {action: "Microsoft.KeyVault/vaults/secrets/setSecret/action", maps: ["security:write"]}
+  - {action: "Microsoft.KeyVault/vaults/keys/read", maps: ["security:read"]}
+  - {action: "Microsoft.KeyVault/vaults/keys/write", maps: ["security:write"]}
+  - {action: "Microsoft.Security/*/read", maps: ["security:read"]}
+  - {action: "Microsoft.Security/policies/write", maps: ["security:admin"]}
+  - {action: "Microsoft.Insights/*/read", maps: ["security:read"]}
+  - {action: "Microsoft.Insights/alertRules/write", maps: ["security:write"]}
+  - {action: "Microsoft.Insights/diagnosticSettings/write", maps: ["security:write"]}
+  - {action: "Microsoft.OperationalInsights/workspaces/query/read", maps: ["security:read"]}
+  - {action: "Microsoft.OperationalInsights/workspaces/sharedKeys/action", maps: ["security:admin"]}
+  - {action: "Microsoft.Billing/*/read", maps: ["billing:read"]}
+  - {action: "Microsoft.Billing/billingAccounts/write", maps: ["billing:billing"]}
+  - {action: "Microsoft.Billing/billingAccounts/billingProfiles/write", maps: ["billing:billing"]}
+  - {action: "Microsoft.Billing/billingAccounts/paymentMethods/write", maps: ["billing:billing"]}
+  - {action: "Microsoft.Consumption/*/read", maps: ["billing:read"]}
+  - {action: "Microsoft.Consumption/budgets/write", maps: ["billing:billing"]}
+  - {action: "Microsoft.CostManagement/*/read", maps: ["billing:read"]}
+  - {action: "Microsoft.CostManagement/exports/write", maps: ["billing:billing"]}
+  - {action: "Microsoft.Resources/subscriptions/resourceGroups/read", maps: ["compute:read"]}
+  - {action: "Microsoft.Resources/subscriptions/resourceGroups/write", maps: ["compute:write"]}
+  - {action: "Microsoft.Resources/subscriptions/resourceGroups/delete", maps: ["compute:delete"]}
+  - {action: "Microsoft.Resources/deployments/write", maps: ["compute:write"]}
+  - {action: "Microsoft.Support/*", maps: ["security:write"]}
+  - action: "*/read"
+    maps: ["*:read"]
+    expect: ["compute:read", "storage:read", "network:read", "identity:read", "data:read",
+             "security:read", "billing:read"]
+
+# Built-in roles: matched by `id` (GUID) or `name`. (verify) — GUIDs transcribed from the Azure
+# built-in roles reference; SPEC §4.6 lists the first four.
+roles:
+  - name: Owner
+    id: 8e3af657-a8ff-443c-a75c-2fe8c4bcb635
+    maps: ["*:admin", "identity:grant", "identity:impersonate"]
+    expect: ["compute:admin", "storage:admin", "network:admin", "identity:admin", "data:admin",
+             "security:admin", "billing:admin", "identity:grant", "identity:impersonate"]
+  - name: Contributor
+    id: b24988ac-6180-42a0-ab88-20f7382dd24c
+    maps: ["compute:read", "compute:write", "compute:delete",
+           "storage:read", "storage:write", "storage:delete",
+           "network:read", "network:write", "network:delete",
+           "data:read", "data:write", "data:delete",
+           "security:read", "security:write", "security:delete",
+           "billing:read", "billing:billing",
+           "identity:read", "identity:write", "identity:delete", "identity:impersonate"]
+  - name: Reader
+    id: acdd72a7-3385-48ef-bd42-f606fba81ae7
+    maps: ["*:read"]
+    expect: ["compute:read", "storage:read", "network:read", "identity:read", "data:read",
+             "security:read", "billing:read"]
+  - name: User Access Administrator
+    id: 18d7d88d-d35e-4fb5-a5c3-7773c20a72d9
+    maps: ["identity:grant", "identity:read"]
+  - name: Storage Blob Data Contributor
+    id: ba92f5b4-2d11-453d-a403-e96b0029c9fe
+    maps: ["storage:read", "storage:write", "storage:delete"]
+  - name: Storage Blob Data Reader
+    id: 2a2b9908-6ea1-4ae2-8e65-a410df84e7d1
+    maps: ["storage:read"]
+  - name: Storage Blob Data Owner
+    id: b7e6dc6d-f1e8-4753-8033-0f276bb0955b
+    maps: ["storage:read", "storage:write", "storage:delete", "storage:admin"]
+  - name: Storage Account Contributor
+    id: 17d1049b-9a84-46fb-8f53-869881c3d3ab
+    maps: ["storage:read", "storage:write", "storage:delete", "storage:admin"]
+  - name: Storage Account Key Operator Service Role
+    id: 81a9662b-bebf-436f-a333-f67b29880f12
+    maps: ["storage:admin"]
+  - name: Virtual Machine Contributor
+    id: 9980e02c-c2be-4d73-94e8-173b1dc7cf3c
+    maps: ["compute:read", "compute:write", "compute:delete", "network:read", "network:write"]
+  - name: Virtual Machine Administrator Login
+    id: 1c0163c0-47e6-4577-8991-ea5c82e286e4
+    maps: ["compute:admin"]
+  - name: SQL DB Contributor
+    id: 9b7fa17d-e63e-47b0-bb0a-15c516ac86ec
+    maps: ["data:read", "data:write", "data:delete"]
+  - name: SQL Server Contributor
+    id: 6d8ee4ec-f05a-4a1d-8b00-a9b17e38b437
+    maps: ["data:read", "data:write", "data:delete", "data:admin"]
+  - name: Key Vault Administrator
+    id: 00482a5a-887f-4fb3-b363-3b7fe8e74483
+    maps: ["security:read", "security:write", "security:delete", "security:admin"]
+  - name: Key Vault Secrets User
+    id: 4633458b-17de-408a-b874-0445c86b69e6
+    maps: ["security:read"]
+  - name: Key Vault Secrets Officer
+    id: b86a8fe4-44ce-4948-aee5-eccb2c155cd7
+    maps: ["security:read", "security:write", "security:delete"]
+  - name: Security Reader
+    id: 39bc4728-0917-49c7-9d2c-d95423bc2eb4
+    maps: ["security:read"]
+  - name: Security Admin
+    id: fb1c8493-542b-47a4-94b3-c7a5b0dc4d0d
+    maps: ["security:read", "security:write", "security:admin"]
+  - name: Billing Reader
+    id: fa23ad8b-c56e-40d8-ac0c-ce449e1d2c64
+    maps: ["billing:read"]
+  - name: Cost Management Reader
+    id: 72fafb9e-0641-4937-9268-a91bfd8191a3
+    maps: ["billing:read"]
+  - name: Cost Management Contributor
+    id: 434e95af-c9d0-4a8d-9d8b-e6d9ad1ea10d
+    maps: ["billing:read", "billing:billing"]
+  - name: Network Contributor
+    id: 4d97b98b-1d4f-4787-a291-c67834d212e7
+    maps: ["network:read", "network:write", "network:delete"]
+  - name: Monitoring Reader
+    id: 43d0d8ad-25c7-4714-9337-8ba259a9fe05
+    maps: ["security:read"]
+  - name: Monitoring Contributor
+    id: 749f88d5-cbae-40b8-bcfc-e573ddc772fa
+    maps: ["security:read", "security:write", "security:delete"]
+  - name: Log Analytics Reader
+    id: 73c42c96-874c-492f-b8e5-d6eef1b6f0f2
+    maps: ["security:read"]
+  - name: Managed Identity Operator
+    id: f1a07417-d97a-45cb-824c-7a7467783830
+    maps: ["identity:impersonate", "identity:read"]
+  - name: Managed Identity Contributor
+    id: e40ec5ca-96e0-45a2-b4ff-59039f2c2b59
+    maps: ["identity:read", "identity:write", "identity:delete"]
+  - name: Website Contributor
+    id: de139f84-1756-47ae-9be6-808fbbe84772
+    maps: ["compute:read", "compute:write", "compute:delete"]
+  - name: Azure Kubernetes Service Cluster Admin Role
+    id: 0ab0b1a8-8aac-4efd-b8c2-3ee1fb270be8
+    maps: ["compute:admin"]
+  - name: Data Factory Contributor
+    id: 673868aa-7521-48a0-acc6-0f60742d39f5
+    maps: ["data:read", "data:write", "data:delete"]
+  - name: Cosmos DB Account Reader Role
+    id: fbdf93bf-df7d-467e-a4d2-9458aa1360c8
+    maps: ["data:read"]

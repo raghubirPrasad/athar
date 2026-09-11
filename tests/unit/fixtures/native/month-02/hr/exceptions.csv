@@ -1,0 +1,3 @@
+identity_id,exception_type,approved_by,approved_on,review_date,expires_on,justification
+emp-0005,break-glass,ciso@nda.example,2025-09-01,2026-03-01,,Break-glass administrator; MFA enforced; quarterly review
+emp-0009,approved-privileged-role,ciso@nda.example,2024-01-15,2025-06-30,,Expired sanctioned administrator entry (review lapsed)

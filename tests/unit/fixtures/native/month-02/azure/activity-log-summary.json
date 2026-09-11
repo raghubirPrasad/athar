@@ -1,0 +1,6 @@
+[
+  {"principalId": "aaaaaaaa-0001-4000-8000-000000000001", "resourceProvider": "Microsoft.Storage", "lastOperationTime": "2025-09-22T08:00:00Z", "operationCount": 17},
+  {"principalId": "aaaaaaaa-0003-4000-8000-000000000003", "resourceProvider": "Microsoft.Compute", "lastOperationTime": "2025-05-10T08:00:00Z", "operationCount": 3},
+  {"principalId": "cccccccc-0101-4000-8000-000000000101", "resourceProvider": "Microsoft.Authorization", "lastOperationTime": "2025-09-18T08:00:00Z", "operationCount": 2},
+  {"principalId": "cccccccc-0101-4000-8000-000000000101", "resourceProvider": "Microsoft.Unknownprovider", "lastOperationTime": "2025-09-19T08:00:00Z", "operationCount": 1}
+]

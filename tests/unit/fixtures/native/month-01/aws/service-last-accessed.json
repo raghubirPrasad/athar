@@ -1,0 +1,33 @@
+[
+  {
+    "Arn": "arn:aws:iam::123456789012:user/aisha.almansoori",
+    "JobStatus": "COMPLETED",
+    "ServicesLastAccessed": [
+      {"ServiceName": "Amazon S3", "ServiceNamespace": "s3", "LastAuthenticated": "2025-09-24T10:00:00Z", "TotalAuthenticatedEntities": 1},
+      {"ServiceName": "Amazon DynamoDB", "ServiceNamespace": "dynamodb", "LastAuthenticated": "2025-09-20T10:00:00Z", "TotalAuthenticatedEntities": 1},
+      {"ServiceName": "AWS Billing", "ServiceNamespace": "aws-portal", "TotalAuthenticatedEntities": 0}
+    ]
+  },
+  {
+    "Arn": "arn:aws:iam::123456789012:user/omar.haddad",
+    "JobStatus": "COMPLETED",
+    "ServicesLastAccessed": [
+      {"ServiceName": "Amazon EC2", "ServiceNamespace": "ec2", "LastAuthenticated": "2025-09-26T10:00:00Z", "TotalAuthenticatedEntities": 1},
+      {"ServiceName": "AWS IAM", "ServiceNamespace": "iam", "LastAuthenticated": "2025-09-15T10:00:00Z", "TotalAuthenticatedEntities": 1}
+    ]
+  },
+  {
+    "Arn": "arn:aws:iam::123456789012:user/svc-batch",
+    "JobStatus": "COMPLETED",
+    "ServicesLastAccessed": [
+      {"ServiceName": "Amazon S3", "ServiceNamespace": "s3", "LastAuthenticated": "2025-04-02T02:00:00Z", "TotalAuthenticatedEntities": 1}
+    ]
+  },
+  {
+    "Arn": "arn:aws:iam::123456789012:role/etl-runner",
+    "JobStatus": "COMPLETED",
+    "ServicesLastAccessed": [
+      {"ServiceName": "Amazon S3", "ServiceNamespace": "s3", "LastAuthenticated": "2025-09-10T04:12:00Z", "TotalAuthenticatedEntities": 1}
+    ]
+  }
+]

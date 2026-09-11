@@ -1,0 +1,7 @@
+[
+  {
+    "name": "no-principal",
+    "roleDefinitionName": "Reader",
+    "scope": "/subscriptions/x"
+  }
+]

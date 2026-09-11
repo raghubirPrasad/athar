@@ -1,0 +1,262 @@
+# ATHAR provider mapping — GCP (SPEC §5.3). The ONLY place GCP predefined roles and IAM
+# permissions are mapped to canonical (service_category, verb) pairs. Every entry is exercised by
+# tests/unit/test_mappings_gcp.py.
+version: 1
+cloud: gcp
+
+# Scope levels (SPEC §5.2): resource → resource, project → project, folder/org → org.
+scope_levels:
+  - {pattern: '^\*$', level: global}
+  - {pattern: '^(organizations|folders)/', level: org}
+  - {pattern: '^projects/[^/]+/?$', level: project}
+  - {pattern: '^projects/[^/]+/.+', level: resource}
+  - {pattern: '^//', level: resource}
+
+# Permission service prefix (`storage.objects.get` → storage) → service_category. Also used for
+# `roles/<service>.<name>` roles that are not listed explicitly.
+services:
+  storage: storage
+  file: storage
+  compute: compute
+  run: compute
+  container: compute
+  cloudfunctions: compute
+  appengine: compute
+  dns: network
+  networkservices: network
+  networksecurity: network
+  iam: identity
+  resourcemanager: identity
+  iap: identity
+  bigquery: data
+  cloudsql: data
+  pubsub: data
+  datastore: data
+  spanner: data
+  bigtable: data
+  dataflow: data
+  dataproc: data
+  logging: security
+  monitoring: security
+  cloudkms: security
+  secretmanager: security
+  securitycenter: security
+  serviceusage: security
+  orgpolicy: security
+  accesscontextmanager: security
+  billing: billing
+
+# Last segment of a permission (`storage.objects.get` → get) → verb.
+verb_suffixes:
+  get: read
+  list: read
+  getIamPolicy: read
+  export: read
+  create: write
+  update: write
+  patch: write
+  use: write
+  start: write
+  stop: write
+  attach: write
+  detach: write
+  import: write
+  undelete: write
+  publish: write
+  consume: read
+  delete: delete
+  setIamPolicy: admin
+  actAs: impersonate
+  getAccessToken: impersonate
+  getOpenIdToken: impersonate
+  signBlob: impersonate
+  signJwt: impersonate
+  implicitDelegation: impersonate
+
+# Explicit permissions (custom roles carry `includedPermissions`).
+permissions:
+  - {permission: "resourcemanager.projects.setIamPolicy", maps: ["identity:grant"]}
+  - {permission: "resourcemanager.folders.setIamPolicy", maps: ["identity:grant"]}
+  - {permission: "resourcemanager.organizations.setIamPolicy", maps: ["identity:grant"]}
+  - {permission: "resourcemanager.projects.get", maps: ["identity:read"]}
+  - {permission: "resourcemanager.projects.getIamPolicy", maps: ["identity:read"]}
+  - {permission: "iam.serviceAccounts.setIamPolicy", maps: ["identity:grant"]}
+  - {permission: "iam.serviceAccounts.actAs", maps: ["identity:impersonate"]}
+  - {permission: "iam.serviceAccounts.getAccessToken", maps: ["identity:impersonate"]}
+  - {permission: "iam.serviceAccounts.signBlob", maps: ["identity:impersonate"]}
+  - {permission: "iam.serviceAccounts.implicitDelegation", maps: ["identity:impersonate"]}
+  - {permission: "iam.serviceAccounts.create", maps: ["identity:write"]}
+  - {permission: "iam.serviceAccounts.delete", maps: ["identity:delete"]}
+  - {permission: "iam.serviceAccountKeys.create", maps: ["identity:write"]}
+  - {permission: "iam.serviceAccountKeys.delete", maps: ["identity:delete"]}
+  - {permission: "iam.roles.create", maps: ["identity:write"]}
+  - {permission: "iam.roles.update", maps: ["identity:write"]}
+  - {permission: "iam.roles.delete", maps: ["identity:delete"]}
+  - {permission: "storage.objects.get", maps: ["storage:read"]}
+  - {permission: "storage.objects.list", maps: ["storage:read"]}
+  - {permission: "storage.objects.create", maps: ["storage:write"]}
+  - {permission: "storage.objects.delete", maps: ["storage:delete"]}
+  - {permission: "storage.buckets.setIamPolicy", maps: ["storage:admin"]}
+  - {permission: "storage.buckets.delete", maps: ["storage:delete"]}
+  - {permission: "compute.instances.get", maps: ["compute:read"]}
+  - {permission: "compute.instances.create", maps: ["compute:write"]}
+  - {permission: "compute.instances.delete", maps: ["compute:delete"]}
+  - {permission: "compute.instances.setMetadata", maps: ["compute:admin"]}
+  - {permission: "compute.networks.create", maps: ["network:write"]}
+  - {permission: "compute.networks.delete", maps: ["network:delete"]}
+  - {permission: "compute.firewalls.create", maps: ["network:write"]}
+  - {permission: "compute.firewalls.update", maps: ["network:write"]}
+  - {permission: "compute.firewalls.delete", maps: ["network:delete"]}
+  - {permission: "compute.subnetworks.use", maps: ["network:write"]}
+  - {permission: "compute.networks.get", maps: ["network:read"]}
+  - {permission: "bigquery.tables.getData", maps: ["data:read"]}
+  - {permission: "bigquery.tables.updateData", maps: ["data:write"]}
+  - {permission: "bigquery.tables.delete", maps: ["data:delete"]}
+  - {permission: "bigquery.datasets.setIamPolicy", maps: ["data:admin"]}
+  - {permission: "cloudkms.cryptoKeyVersions.useToDecrypt", maps: ["security:read"]}
+  - {permission: "cloudkms.cryptoKeyVersions.useToEncrypt", maps: ["security:write"]}
+  - {permission: "secretmanager.versions.access", maps: ["security:read"]}
+  - {permission: "billing.accounts.get", maps: ["billing:read"]}
+  - {permission: "billing.accounts.update", maps: ["billing:billing"]}
+  - {permission: "billing.resourceAssociations.create", maps: ["billing:billing"]}
+
+# Predefined roles (SPEC §5.3). `roles/owner` → admin at scope; `roles/editor` → write+delete
+# (plus read) on every category — no admin, so R1 does not fire on an Editor (SPEC §7 R4).
+roles:
+  - role: roles/owner
+    maps: ["*:admin", "identity:grant", "identity:impersonate"]
+    expect: ["compute:admin", "storage:admin", "network:admin", "identity:admin", "data:admin",
+             "security:admin", "billing:admin", "identity:grant", "identity:impersonate"]
+  - role: roles/editor
+    maps: ["*:read", "*:write", "*:delete"]
+    expect: ["compute:read", "compute:write", "compute:delete",
+             "storage:read", "storage:write", "storage:delete",
+             "network:read", "network:write", "network:delete",
+             "identity:read", "identity:write", "identity:delete",
+             "data:read", "data:write", "data:delete",
+             "security:read", "security:write", "security:delete",
+             "billing:read", "billing:write", "billing:delete"]
+  - role: roles/viewer
+    maps: ["*:read"]
+    expect: ["compute:read", "storage:read", "network:read", "identity:read", "data:read",
+             "security:read", "billing:read"]
+  - role: roles/browser
+    maps: ["identity:read"]
+  - role: roles/iam.serviceAccountUser
+    maps: ["identity:impersonate"]
+  - role: roles/iam.serviceAccountTokenCreator
+    maps: ["identity:impersonate"]
+  - role: roles/iam.serviceAccountKeyAdmin
+    maps: ["identity:impersonate", "identity:write"]
+  - role: roles/iam.serviceAccountAdmin
+    maps: ["identity:write", "identity:delete", "identity:grant"]
+  - role: roles/iam.serviceAccountViewer
+    maps: ["identity:read"]
+  - role: roles/iam.roleAdmin
+    maps: ["identity:write"]
+  - role: roles/iam.organizationRoleAdmin
+    maps: ["identity:write"]
+  - role: roles/iam.securityAdmin
+    maps: ["identity:grant", "identity:read"]
+  - role: roles/iam.securityReviewer
+    maps: ["identity:read", "security:read"]
+  - role: roles/resourcemanager.projectIamAdmin
+    maps: ["identity:grant"]
+  - role: roles/resourcemanager.folderIamAdmin
+    maps: ["identity:grant"]
+  - role: roles/resourcemanager.organizationAdmin
+    maps: ["identity:grant", "identity:read"]
+  - role: roles/resourcemanager.projectCreator
+    maps: ["identity:write"]
+  - role: roles/storage.admin
+    maps: ["storage:read", "storage:write", "storage:delete", "storage:admin"]
+  - role: roles/storage.objectViewer
+    maps: ["storage:read"]
+  - role: roles/storage.objectCreator
+    maps: ["storage:write"]
+  - role: roles/storage.objectUser
+    maps: ["storage:read", "storage:write", "storage:delete"]
+  - role: roles/storage.objectAdmin
+    maps: ["storage:read", "storage:write", "storage:delete"]
+  - role: roles/storage.legacyBucketOwner
+    maps: ["storage:read", "storage:write", "storage:delete", "storage:admin"]
+  - role: roles/bigquery.admin
+    maps: ["data:read", "data:write", "data:delete", "data:admin"]
+  - role: roles/bigquery.dataViewer
+    maps: ["data:read"]
+  - role: roles/bigquery.dataEditor
+    maps: ["data:read", "data:write", "data:delete"]
+  - role: roles/bigquery.dataOwner
+    maps: ["data:read", "data:write", "data:delete", "data:admin"]
+  - role: roles/bigquery.jobUser
+    maps: ["data:read"]
+  - role: roles/bigquery.user
+    maps: ["data:read", "data:write"]
+  - role: roles/compute.admin
+    maps: ["compute:read", "compute:write", "compute:delete", "compute:admin"]
+  - role: roles/compute.viewer
+    maps: ["compute:read"]
+  - role: roles/compute.instanceAdmin.v1
+    maps: ["compute:read", "compute:write", "compute:delete"]
+  - role: roles/compute.networkAdmin
+    maps: ["network:read", "network:write", "network:delete", "network:admin"]
+  - role: roles/compute.networkViewer
+    maps: ["network:read"]
+  - role: roles/compute.securityAdmin
+    maps: ["network:read", "network:write", "network:delete", "network:admin"]
+  - role: roles/container.admin
+    maps: ["compute:read", "compute:write", "compute:delete", "compute:admin"]
+  - role: roles/run.admin
+    maps: ["compute:read", "compute:write", "compute:delete", "compute:admin"]
+  - role: roles/run.invoker
+    maps: ["compute:write"]
+  - role: roles/billing.admin
+    maps: ["billing:read", "billing:billing", "billing:admin"]
+  - role: roles/billing.viewer
+    maps: ["billing:read"]
+  - role: roles/billing.user
+    maps: ["billing:read", "billing:billing"]
+  - role: roles/billing.projectManager
+    maps: ["billing:billing"]
+  - role: roles/logging.viewer
+    maps: ["security:read"]
+  - role: roles/logging.admin
+    maps: ["security:read", "security:write", "security:delete", "security:admin"]
+  - role: roles/logging.logWriter
+    maps: ["security:write"]
+  - role: roles/monitoring.viewer
+    maps: ["security:read"]
+  - role: roles/monitoring.editor
+    maps: ["security:read", "security:write", "security:delete"]
+  - role: roles/cloudkms.admin
+    maps: ["security:read", "security:write", "security:delete", "security:admin"]
+  - role: roles/cloudkms.cryptoKeyEncrypterDecrypter
+    maps: ["security:read", "security:write"]
+  - role: roles/secretmanager.admin
+    maps: ["security:read", "security:write", "security:delete", "security:admin"]
+  - role: roles/secretmanager.secretAccessor
+    maps: ["security:read"]
+  - role: roles/cloudsql.admin
+    maps: ["data:read", "data:write", "data:delete", "data:admin"]
+  - role: roles/cloudsql.client
+    maps: ["data:read", "data:write"]
+  - role: roles/cloudsql.viewer
+    maps: ["data:read"]
+  - role: roles/pubsub.editor
+    maps: ["data:read", "data:write", "data:delete"]
+  - role: roles/pubsub.admin
+    maps: ["data:read", "data:write", "data:delete", "data:admin"]
+  - role: roles/pubsub.publisher
+    maps: ["data:write"]
+  - role: roles/pubsub.subscriber
+    maps: ["data:read"]
+  - role: roles/pubsub.viewer
+    maps: ["data:read"]
+  - role: roles/dataflow.admin
+    maps: ["data:read", "data:write", "data:delete", "data:admin"]
+  - role: roles/dataflow.worker
+    maps: ["data:read", "data:write"]
+  - role: roles/serviceusage.serviceUsageAdmin
+    maps: ["security:write"]
+  - role: roles/serviceusage.serviceUsageConsumer
+    maps: ["security:read"]

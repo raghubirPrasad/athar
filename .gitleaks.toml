@@ -1,0 +1,15 @@
+title = "ATHAR gitleaks config"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Anvil dev keys are publicly known and labelled as such"
+regexes = [
+  '''0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80''',
+]
+paths = [
+  '''contracts/lib/.*''',
+  '''frontend/package-lock.json''',
+  '''backend/uv.lock''',
+]

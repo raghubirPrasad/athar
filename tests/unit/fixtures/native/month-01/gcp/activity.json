@@ -1,0 +1,6 @@
+[
+  {"project": "nda-analytics-prod", "member": "user:fatima.saeed@nda.example", "role": "roles/owner", "lastAuthenticatedTime": "2025-05-20T10:00:00Z", "usedPermissionsCount": 3, "totalPermissionsCount": 5000},
+  {"project": "nda-analytics-prod", "member": "serviceAccount:etl@nda-analytics-prod.iam.gserviceaccount.com", "role": "roles/iam.serviceAccountUser", "lastAuthenticatedTime": "2025-09-27T02:00:00Z", "usedPermissionsCount": 1, "totalPermissionsCount": 1},
+  {"project": "nda-analytics-prod", "member": "user:omar.haddad@nda.example", "role": "roles/editor", "lastAuthenticatedTime": "2025-09-29T10:00:00Z", "usedPermissionsCount": 12, "totalPermissionsCount": 1200},
+  {"project": "nda-analytics-prod", "member": "user:aisha.almansoori@nda.example", "role": "roles/bigquery.dataViewer", "lastAuthenticatedTime": null, "usedPermissionsCount": 0, "totalPermissionsCount": 12}
+]

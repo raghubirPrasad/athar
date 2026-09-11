@@ -1,0 +1,22 @@
+# ATHAR canonical dimensions (SPEC §5.2, §5.3). Shared by the three provider mappings.
+#
+# `categories` lists, per service category, the verbs a full wildcard on that category
+# implies ("s3:*" → every verb on storage; "iam:*" → admin, grant, impersonate on identity,
+# SPEC §5.3). "*" / "*:*" expands to every category × its wildcard verbs, which covers all
+# seven verbs and all seven categories.
+#
+# `identity` is deliberately narrower than the union of its listed actions: SPEC §5.3 fixes the
+# meaning of "iam:*" as admin + grant + impersonate. Those dominate the identity read/write/delete
+# that individual iam actions map to, so no rule loses a finding; see the note in test_expand.py.
+version: 1
+
+verbs: [read, write, delete, admin, grant, impersonate, billing]
+
+categories:
+  compute: [read, write, delete, admin]
+  storage: [read, write, delete, admin]
+  network: [read, write, delete, admin]
+  data: [read, write, delete, admin]
+  security: [read, write, delete, admin]
+  identity: [admin, grant, impersonate]
+  billing: [read, billing]

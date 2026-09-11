@@ -1,0 +1,9 @@
+# SYNTHETIC — Nahar Digital Authority test estate (SPEC §4.1); no real persons, nda.example only
+employee_id,email,display_name,department,title,employment_type,status,start_date,end_date,contract_end,manager_id
+emp-0001,aisha.almansoori@nda.example,Aisha Al Mansoori,Finance,Finance Systems Lead,staff,active,2024-03-01,,,emp-0009
+emp-0002,omar.haddad@nda.example,Omar Haddad,Platform Engineering,Cloud Engineer,staff,active,2025-09-08,,,emp-0009
+emp-0003,fatima.saeed@nda.example,Fatima Saeed,Data Services,Data Engineer,staff,departed,2023-01-10,2025-09-20,,emp-0009
+emp-0004,rashid.contractor@nda.example,Rashid Bin Ali,Contractors,Integration Contractor,contractor,active,2025-09-01,,2026-06-30,emp-0002
+emp-0005,layla.hassan@nda.example,Layla Hassan,Cyber Security,Security Analyst,staff,active,2025-09-01,,,emp-0009
+emp-0009,khalid.alnuaimi@nda.example,Khalid Al Nuaimi,Finance,Director,staff,active,2020-01-01,,,
+svc-0001,svc-etl@nda.example,svc-etl,Data Services,ETL pipeline account,service,active,2025-09-01,,,emp-0003

@@ -1,0 +1,112 @@
+# Narrative catalogue (SPEC §10.2). Templated language with slotted facts so the same data
+# always yields the same sentence an auditor can sign. Slots are `{name}` and resolve to
+# athar.detection.facts.required_slots(rule) ∪ athar.narrative.slots derived slots.
+# No format specs or conversions ({x:.2f}, {x!r}) — every slot renders as plain text.
+#
+# Register: formal, plain, no jargon. Headlines carry no cloud-provider terms and no
+# identifiers beyond display name and department. Explanations may use canonical terms
+# (cloud, scope, verb) and scope names. Evidence is structured in templates.py.
+
+version: 1
+
+rule_text:
+  R0:
+    severity: Low
+    name: Unmapped permission
+    summary: A provider permission that the mapping tables could not classify; its verb and category stay unclassified until a mapping is added.
+  R1:
+    severity: High
+    name: Wildcard or administrative privilege
+    summary: An identity holds admin at project scope or above, or an unexpanded wildcard action, without an unexpired break-glass or approved-privileged-role exception in the governance register.
+  R2:
+    severity: Medium
+    name: Dormant access
+    summary: No activity in any category for at least the dormancy threshold while a grant beyond read remains active, with no unexpired dr-failover exception.
+  R3:
+    severity: Critical
+    name: Orphaned identity
+    summary: A departed employee (for at least one month) or a service account of a retired project that still holds active grants.
+  R4:
+    severity: Critical  # Critical for admin, High for write+delete (SPEC §7)
+    name: Cross-cloud superuser
+    summary: One identity holds admin (Critical) or write and delete (High) at project scope or above in all three clouds.
+  R5:
+    severity: High
+    name: Toxic combination
+    summary: Grants that are ordinary on their own but combine into a self-escalation path of three steps or fewer in the access graph.
+  R6:
+    severity: Medium
+    name: Stale credential
+    summary: An active credential whose last rotation is older than the rotation threshold; service-account keys older than a year are High.
+  R7:
+    severity: Low
+    name: Peer outlier
+    summary: Grant count above the department median plus two median absolute deviations, in at least two more service categories than peers.
+  R8:
+    severity: High
+    name: Data-residency drift
+    summary: A grant on a high-sensitivity resource located outside the approved regions.
+  R9:
+    severity: High
+    name: Privileged human without MFA
+    summary: A human identity with admin, grant or impersonate access and multi-factor authentication not enforced.
+  R10:
+    severity: Medium
+    name: Unowned principal
+    summary: A cloud principal that could not be linked to any HR record by exact, derived or heuristic matching.
+
+rules:
+  R0:
+    headline: "{display_name} ({department_phrase}) holds a permission that could not be classified and whose reach cannot yet be measured."
+    explanation: "The {cloud_name} action {raw_action} held by {principal_ref} has no entry in the provider mapping tables, so its verb and category could not be classified across {grant_count_word} {grant_word}. Unclassified permissions cannot be measured for blast radius and may hide privilege."
+    remediation_effect: "Adding the action to the mapping table classifies the permission so the rule engine can assess it; no cloud change is needed unless the mapped verb turns out to be privileged."
+
+  R1:
+    headline: "{display_name} ({department_phrase}) holds {admin_phrase}{wildcard_headline_clause}."
+    explanation: "{display_name} ({department_phrase}, {identity_type_phrase}) holds an admin grant at {scope_level} scope in {cloud_name} on {scope_ref}, granted via {granted_via}{wildcard_clause}, across {grant_count_word} {grant_word}. The governance register holds no unexpired break-glass or approved-privileged-role exception for this identity, so the grant is treated as unapproved standing privilege."
+    remediation_effect: "Revoking or downgrading the {grant_count_word} administrative {grant_word} removes this identity's unrestricted reach in {cloud_name} entirely."
+
+  R2:
+    headline: "{display_name} ({department_phrase}) still holds access that {dormant_phrase}."
+    explanation: "No activity has been recorded for {display_name} ({department_phrase}, {identity_type_phrase}) since {last_activity_label}, {dormant_days} days before the snapshot month-end and beyond the dormancy threshold of {threshold_dormant_days} days, while {grant_count_word} {grant_word} beyond read remain active in {clouds_with_write_phrase}. The governance register holds no unexpired dr-failover exception."
+    remediation_effect: "Revoking the {grant_count_word} unused {grant_word} removes standing access that nobody is exercising; disabling the identity removes it entirely."
+
+  R3:
+    headline: "{display_name} ({department_phrase}) {orphan_phrase} but still holds live access."
+    explanation: "{orphan_explanation} Access that outlives its owner has nobody accountable for how it is used."
+    remediation_effect: "Disabling the identity and removing its cloud access closes the {grant_count_word} remaining {grant_word} at once and leaves nothing behind."
+
+  R4:
+    headline: "{display_name} ({department_phrase}) {cross_cloud_phrase}."
+    explanation: "{display_name} ({department_phrase}, {identity_type_phrase}) holds {power_explanation} in {per_cloud_phrase}. Each grant may be acceptable on its own; together they give one identity control of compute, storage and data everywhere."
+    remediation_effect: "Downgrading to least privilege in any one cloud breaks the cross-cloud combination; removing access in {clouds_list} eliminates it."
+
+  R5:
+    headline: "{display_name} ({department_phrase}) {combination_phrase}."
+    explanation: "{display_name} ({department_phrase}, {identity_type_phrase}) holds a toxic combination ({combination}): the access graph shows a self-escalation path of {path_len_word} {step_word}: {path_phrase}. Individually ordinary grants combine into the ability to raise their own privilege."
+    remediation_effect: "Revoking any one of the {grant_count_word} {grant_word} on the path breaks the escalation chain; downgrading the identity-write or grant permission removes it at the source."
+
+  R6:
+    headline: "{display_name} ({department_phrase}) {stale_phrase}."
+    explanation: "The {kind_phrase} {credential_ref} in {cloud_name} was last rotated on {last_rotated_label}, {age_days} days before the snapshot month-end, against a rotation threshold of {threshold_days} days, and is still active."
+    remediation_effect: "Rotating or disabling the credential invalidates anything copied from it during the {stale_months} it went unrotated."
+
+  R7:
+    headline: "{display_name} ({department_phrase}) {outlier_phrase}."
+    explanation: "{display_name} ({department_phrase}, {identity_type_phrase}) holds {grant_count_word} {grant_word} against a department median of {median_word} (spread {department_mad}), and reaches {categories_over_phrase} more service {category_word} than peers, who typically use {peer_categories_phrase}."
+    remediation_effect: "Downgrading to the department's typical access removes the excess grants while leaving normal work unaffected."
+
+  R8:
+    headline: "{display_name} ({department_phrase}) {residency_phrase}."
+    explanation: "{display_name} ({department_phrase}, {identity_type_phrase}) holds {grant_count_word} {grant_word} on {resource_ref} in {cloud_name}, a {resource_sensitivity}-sensitivity resource located in region {region}, which is not among the approved regions ({approved_regions_phrase})."
+    remediation_effect: "Revoking the {grant_word} on the out-of-region resource removes this identity's reach into data held outside approved regions; the resource's own location remains a question for the data owner."
+
+  R9:
+    headline: "{display_name} ({department_phrase}) {no_mfa_phrase}."
+    explanation: "{display_name} ({department_phrase}, {identity_type_phrase}) is a human identity holding {verbs_phrase} in {clouds_privileged_phrase} across {grant_count_word} {grant_word}, and multi-factor authentication is recorded as not enforced. A single stolen password would carry that power."
+    remediation_effect: "Enforcing multi-factor authentication or downgrading the privileged grants means a password alone no longer carries administrative power."
+
+  R10:
+    headline: "{display_name} is {unowned_phrase}, yet it still holds live access."
+    explanation: "The {cloud_name} {principal_type_phrase} {principal_ref} could not be linked to any HR record ({link_attempts_phrase}), yet it holds {grant_count_word} active {grant_word}. Access without an accountable owner cannot be reviewed, recertified or offboarded."
+    remediation_effect: "Removing the principal's cloud access or disabling it eliminates access that nobody is accountable for; if it does belong to someone, recording the owner in HR resolves the finding."

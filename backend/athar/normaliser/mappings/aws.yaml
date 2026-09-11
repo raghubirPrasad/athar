@@ -1,0 +1,521 @@
+# ATHAR provider mapping — AWS (SPEC §5.3). The ONLY place AWS actions and managed policies
+# are mapped to canonical (service_category, verb) pairs. Every entry is exercised by
+# tests/unit/test_mappings_aws.py, which reads `expect` (or `maps` when it has no wildcard).
+#
+# `maps` entries are "category:verb"; "*" may stand for every category or for the category's
+# wildcard verb set (mappings/canonical.yaml). An entry using "*" MUST carry an explicit `expect`.
+version: 1
+cloud: aws
+
+# Scope levels (SPEC §5.2): first regex that matches the Resource string wins; default resource.
+scope_levels:
+  - {pattern: '^\*$', level: global}
+  - {pattern: '^arn:[^:]*:organizations:', level: org}
+  - {pattern: '^\d{12}$', level: project}
+  - {pattern: '^arn:[^:]*:[^:]*:[^:]*:\d{12}:(root|\*)$', level: project}
+  - {pattern: '^arn:', level: resource}
+
+# Service namespace (the part before ":") → service_category.
+services:
+  s3: storage
+  glacier: storage
+  elasticfilesystem: storage
+  backup: storage
+  ec2: compute
+  lambda: compute
+  ecs: compute
+  eks: compute
+  autoscaling: compute
+  elasticbeanstalk: compute
+  batch: compute
+  vpc: network
+  elasticloadbalancing: network
+  route53: network
+  cloudfront: network
+  apigateway: network
+  directconnect: network
+  iam: identity
+  sts: identity
+  organizations: identity
+  sso: identity
+  identitystore: identity
+  cognito-idp: identity
+  account: identity
+  rds: data
+  dynamodb: data
+  redshift: data
+  athena: data
+  glue: data
+  kinesis: data
+  sqs: data
+  sns: data
+  kms: security
+  secretsmanager: security
+  ssm: security
+  cloudtrail: security
+  guardduty: security
+  securityhub: security
+  config: security
+  inspector2: security
+  wafv2: security
+  acm: security
+  access-analyzer: security
+  cloudwatch: security
+  logs: security
+  aws-portal: billing
+  billing: billing
+  ce: billing
+  cur: billing
+  budgets: billing
+  tax: billing
+  payments: billing
+
+# Unlisted action on a known service: leading verb word → canonical verb (case-insensitive).
+verb_inference:
+  Get: read
+  List: read
+  Describe: read
+  Head: read
+  Search: read
+  Lookup: read
+  Select: read
+  Scan: read
+  Query: read
+  BatchGet: read
+  Generate: read
+  Simulate: read
+  View: read
+  Put: write
+  Create: write
+  Update: write
+  Modify: write
+  Set: write
+  Add: write
+  Associate: write
+  Attach: write
+  Enable: write
+  Disable: write
+  Start: write
+  Stop: write
+  Reboot: write
+  Run: write
+  Invoke: write
+  Send: write
+  Publish: write
+  Restore: write
+  Register: write
+  Import: write
+  Copy: write
+  Tag: write
+  Untag: write
+  Upload: write
+  Batch: write
+  Delete: delete
+  Remove: delete
+  Terminate: delete
+  Detach: delete
+  Deregister: delete
+  Deactivate: delete
+  Cancel: delete
+  Purge: delete
+
+# Explicit actions. Prefix wildcards ("s3:Get*") are matched against these with fnmatch.
+actions:
+  # --- identity: write ("create-role", SPEC §5.3) ---
+  - {action: "iam:CreateRole", maps: ["identity:write"]}
+  - {action: "iam:CreateUser", maps: ["identity:write"]}
+  - {action: "iam:CreatePolicy", maps: ["identity:write"]}
+  - {action: "iam:CreateServiceLinkedRole", maps: ["identity:write"]}
+  - {action: "iam:CreateGroup", maps: ["identity:write"]}
+  - {action: "iam:UpdateRole", maps: ["identity:write"]}
+  - {action: "iam:UpdateUser", maps: ["identity:write"]}
+  - {action: "iam:TagRole", maps: ["identity:write"]}
+  - {action: "iam:TagUser", maps: ["identity:write"]}
+  - {action: "iam:DeleteRole", maps: ["identity:delete"]}
+  - {action: "iam:DeleteUser", maps: ["identity:delete"]}
+  - {action: "iam:DeletePolicy", maps: ["identity:delete"]}
+  - {action: "iam:DeleteGroup", maps: ["identity:delete"]}
+  - {action: "iam:DeleteServiceLinkedRole", maps: ["identity:delete"]}
+  - {action: "iam:DeleteAccessKey", maps: ["identity:delete"]}
+  # --- identity: grant ("assign-role", SPEC §5.3) ---
+  - {action: "iam:AttachUserPolicy", maps: ["identity:grant"]}
+  - {action: "iam:PutUserPolicy", maps: ["identity:grant"]}
+  - {action: "iam:AttachRolePolicy", maps: ["identity:grant"]}
+  - {action: "iam:PutRolePolicy", maps: ["identity:grant"]}
+  - {action: "iam:AttachGroupPolicy", maps: ["identity:grant"]}
+  - {action: "iam:PutGroupPolicy", maps: ["identity:grant"]}
+  - {action: "iam:CreatePolicyVersion", maps: ["identity:grant"]}
+  - {action: "iam:SetDefaultPolicyVersion", maps: ["identity:grant"]}
+  - {action: "iam:UpdateAssumeRolePolicy", maps: ["identity:grant"]}
+  - {action: "iam:CreateAccessKey", maps: ["identity:grant"]}
+  - {action: "iam:UpdateAccessKey", maps: ["identity:grant"]}
+  - {action: "iam:CreateLoginProfile", maps: ["identity:grant"]}
+  - {action: "iam:UpdateLoginProfile", maps: ["identity:grant"]}
+  - {action: "iam:AddUserToGroup", maps: ["identity:grant"]}
+  - {action: "iam:RemoveUserFromGroup", maps: ["identity:grant"]}
+  - {action: "iam:DetachUserPolicy", maps: ["identity:grant"]}
+  - {action: "iam:DetachRolePolicy", maps: ["identity:grant"]}
+  - {action: "iam:DetachGroupPolicy", maps: ["identity:grant"]}
+  - {action: "iam:DeleteUserPolicy", maps: ["identity:grant"]}
+  - {action: "iam:DeleteRolePolicy", maps: ["identity:grant"]}
+  - {action: "iam:PutRolePermissionsBoundary", maps: ["identity:grant"]}
+  - {action: "iam:DeleteRolePermissionsBoundary", maps: ["identity:grant"]}
+  - {action: "iam:PutUserPermissionsBoundary", maps: ["identity:grant"]}
+  # --- identity: impersonate (SPEC §5.3) ---
+  - {action: "iam:PassRole", maps: ["identity:impersonate"]}
+  - {action: "sts:AssumeRole", maps: ["identity:impersonate"]}
+  - {action: "sts:AssumeRoleWithSAML", maps: ["identity:impersonate"]}
+  - {action: "sts:AssumeRoleWithWebIdentity", maps: ["identity:impersonate"]}
+  - {action: "sts:GetFederationToken", maps: ["identity:impersonate"]}
+  - {action: "sts:TagSession", maps: ["identity:impersonate"]}
+  # --- identity: read ---
+  - {action: "sts:GetCallerIdentity", maps: ["identity:read"]}
+  - {action: "sts:DecodeAuthorizationMessage", maps: ["identity:read"]}
+  - {action: "iam:GetUser", maps: ["identity:read"]}
+  - {action: "iam:GetRole", maps: ["identity:read"]}
+  - {action: "iam:GetPolicy", maps: ["identity:read"]}
+  - {action: "iam:GetPolicyVersion", maps: ["identity:read"]}
+  - {action: "iam:GetAccountAuthorizationDetails", maps: ["identity:read"]}
+  - {action: "iam:ListUsers", maps: ["identity:read"]}
+  - {action: "iam:ListRoles", maps: ["identity:read"]}
+  - {action: "iam:ListPolicies", maps: ["identity:read"]}
+  - {action: "iam:ListAttachedUserPolicies", maps: ["identity:read"]}
+  - {action: "iam:ListAttachedRolePolicies", maps: ["identity:read"]}
+  - {action: "iam:GenerateCredentialReport", maps: ["identity:read"]}
+  - {action: "iam:GetCredentialReport", maps: ["identity:read"]}
+  - {action: "iam:SimulatePrincipalPolicy", maps: ["identity:read"]}
+  # --- identity: wildcard (SPEC §5.3 "iam:* → admin, grant, impersonate") ---
+  - {action: "iam:*", maps: ["identity:*"], expect: ["identity:admin", "identity:grant", "identity:impersonate"]}
+  - {action: "organizations:DescribeOrganization", maps: ["identity:read"]}
+  - {action: "organizations:ListAccounts", maps: ["identity:read"]}
+  - {action: "organizations:DescribeAccount", maps: ["identity:read"]}
+  - {action: "organizations:CreateAccount", maps: ["identity:write"]}
+  - {action: "organizations:InviteAccountToOrganization", maps: ["identity:write"]}
+  - {action: "organizations:RemoveAccountFromOrganization", maps: ["identity:delete"]}
+  - {action: "organizations:LeaveOrganization", maps: ["identity:delete"]}
+  - {action: "organizations:DeleteOrganization", maps: ["identity:delete"]}
+  - {action: "organizations:AttachPolicy", maps: ["identity:grant"]}
+  - {action: "organizations:DetachPolicy", maps: ["identity:grant"]}
+  - {action: "organizations:CreatePolicy", maps: ["identity:grant"]}
+  - {action: "organizations:UpdatePolicy", maps: ["identity:grant"]}
+  - {action: "organizations:*", maps: ["identity:*"], expect: ["identity:admin", "identity:grant", "identity:impersonate"]}
+  # --- storage: s3 ---
+  - {action: "s3:GetObject", maps: ["storage:read"]}
+  - {action: "s3:GetObjectVersion", maps: ["storage:read"]}
+  - {action: "s3:ListBucket", maps: ["storage:read"]}
+  - {action: "s3:ListAllMyBuckets", maps: ["storage:read"]}
+  - {action: "s3:GetBucketLocation", maps: ["storage:read"]}
+  - {action: "s3:GetBucketPolicy", maps: ["storage:read"]}
+  - {action: "s3:GetBucketAcl", maps: ["storage:read"]}
+  - {action: "s3:PutObject", maps: ["storage:write"]}
+  - {action: "s3:PutObjectAcl", maps: ["storage:write"]}
+  - {action: "s3:CreateBucket", maps: ["storage:write"]}
+  - {action: "s3:PutBucketVersioning", maps: ["storage:write"]}
+  - {action: "s3:RestoreObject", maps: ["storage:write"]}
+  - {action: "s3:AbortMultipartUpload", maps: ["storage:write"]}
+  - {action: "s3:DeleteObject", maps: ["storage:delete"]}
+  - {action: "s3:DeleteObjectVersion", maps: ["storage:delete"]}
+  - {action: "s3:DeleteBucket", maps: ["storage:delete"]}
+  - {action: "s3:PutBucketPolicy", maps: ["storage:admin"]}
+  - {action: "s3:PutBucketAcl", maps: ["storage:admin"]}
+  - {action: "s3:PutBucketPublicAccessBlock", maps: ["storage:admin"]}
+  - {action: "s3:DeleteBucketPolicy", maps: ["storage:admin"]}
+  - {action: "s3:PutEncryptionConfiguration", maps: ["storage:admin"]}
+  - {action: "s3:*", maps: ["storage:*"], expect: ["storage:read", "storage:write", "storage:delete", "storage:admin"]}
+  - {action: "s3:Get*", maps: ["storage:read"]}
+  - {action: "s3:List*", maps: ["storage:read"]}
+  - {action: "s3:Put*", maps: ["storage:write", "storage:admin"]}
+  - {action: "s3:Delete*", maps: ["storage:delete", "storage:admin"]}
+  # --- compute: ec2 (VPC/security-group actions are network) ---
+  - {action: "ec2:DescribeInstances", maps: ["compute:read"]}
+  - {action: "ec2:DescribeVolumes", maps: ["compute:read"]}
+  - {action: "ec2:DescribeImages", maps: ["compute:read"]}
+  - {action: "ec2:DescribeSnapshots", maps: ["compute:read"]}
+  - {action: "ec2:DescribeTags", maps: ["compute:read"]}
+  - {action: "ec2:RunInstances", maps: ["compute:write"]}
+  - {action: "ec2:StartInstances", maps: ["compute:write"]}
+  - {action: "ec2:StopInstances", maps: ["compute:write"]}
+  - {action: "ec2:RebootInstances", maps: ["compute:write"]}
+  - {action: "ec2:CreateVolume", maps: ["compute:write"]}
+  - {action: "ec2:AttachVolume", maps: ["compute:write"]}
+  - {action: "ec2:DetachVolume", maps: ["compute:write"]}
+  - {action: "ec2:CreateImage", maps: ["compute:write"]}
+  - {action: "ec2:CreateSnapshot", maps: ["compute:write"]}
+  - {action: "ec2:CreateTags", maps: ["compute:write"]}
+  - {action: "ec2:ModifyInstanceAttribute", maps: ["compute:write"]}
+  - {action: "ec2:TerminateInstances", maps: ["compute:delete"]}
+  - {action: "ec2:DeleteVolume", maps: ["compute:delete"]}
+  - {action: "ec2:DeleteSnapshot", maps: ["compute:delete"]}
+  - {action: "ec2:DeregisterImage", maps: ["compute:delete"]}
+  - {action: "ec2:DescribeVpcs", maps: ["network:read"]}
+  - {action: "ec2:DescribeSubnets", maps: ["network:read"]}
+  - {action: "ec2:DescribeSecurityGroups", maps: ["network:read"]}
+  - {action: "ec2:DescribeRouteTables", maps: ["network:read"]}
+  - {action: "ec2:DescribeNetworkInterfaces", maps: ["network:read"]}
+  - {action: "ec2:CreateVpc", maps: ["network:write"]}
+  - {action: "ec2:CreateSubnet", maps: ["network:write"]}
+  - {action: "ec2:CreateSecurityGroup", maps: ["network:write"]}
+  - {action: "ec2:CreateRouteTable", maps: ["network:write"]}
+  - {action: "ec2:CreateRoute", maps: ["network:write"]}
+  - {action: "ec2:CreateInternetGateway", maps: ["network:write"]}
+  - {action: "ec2:AttachInternetGateway", maps: ["network:write"]}
+  - {action: "ec2:AuthorizeSecurityGroupIngress", maps: ["network:write"]}
+  - {action: "ec2:AuthorizeSecurityGroupEgress", maps: ["network:write"]}
+  - {action: "ec2:RevokeSecurityGroupIngress", maps: ["network:write"]}
+  - {action: "ec2:RevokeSecurityGroupEgress", maps: ["network:write"]}
+  - {action: "ec2:ModifyVpcAttribute", maps: ["network:write"]}
+  - {action: "ec2:DeleteVpc", maps: ["network:delete"]}
+  - {action: "ec2:DeleteSubnet", maps: ["network:delete"]}
+  - {action: "ec2:DeleteSecurityGroup", maps: ["network:delete"]}
+  - {action: "ec2:DeleteRouteTable", maps: ["network:delete"]}
+  - {action: "ec2:DeleteInternetGateway", maps: ["network:delete"]}
+  - action: "ec2:*"
+    maps: ["compute:*", "network:*"]
+    expect: ["compute:read", "compute:write", "compute:delete", "compute:admin",
+             "network:read", "network:write", "network:delete", "network:admin"]
+  - {action: "ec2:Describe*", maps: ["compute:read", "network:read"]}
+  # --- compute: lambda ---
+  - {action: "lambda:GetFunction", maps: ["compute:read"]}
+  - {action: "lambda:ListFunctions", maps: ["compute:read"]}
+  - {action: "lambda:GetPolicy", maps: ["compute:read"]}
+  - {action: "lambda:InvokeFunction", maps: ["compute:write"]}
+  - {action: "lambda:CreateFunction", maps: ["compute:write"]}
+  - {action: "lambda:UpdateFunctionCode", maps: ["compute:write"]}
+  - {action: "lambda:UpdateFunctionConfiguration", maps: ["compute:write"]}
+  - {action: "lambda:PublishVersion", maps: ["compute:write"]}
+  - {action: "lambda:DeleteFunction", maps: ["compute:delete"]}
+  - {action: "lambda:AddPermission", maps: ["compute:admin"]}
+  - {action: "lambda:RemovePermission", maps: ["compute:admin"]}
+  - {action: "lambda:*", maps: ["compute:*"], expect: ["compute:read", "compute:write", "compute:delete", "compute:admin"]}
+  # --- data: rds ---
+  - {action: "rds:DescribeDBInstances", maps: ["data:read"]}
+  - {action: "rds:DescribeDBClusters", maps: ["data:read"]}
+  - {action: "rds:DescribeDBSnapshots", maps: ["data:read"]}
+  - {action: "rds:ListTagsForResource", maps: ["data:read"]}
+  - {action: "rds:CreateDBInstance", maps: ["data:write"]}
+  - {action: "rds:ModifyDBInstance", maps: ["data:write"]}
+  - {action: "rds:RestoreDBInstanceFromDBSnapshot", maps: ["data:write"]}
+  - {action: "rds:StartDBInstance", maps: ["data:write"]}
+  - {action: "rds:StopDBInstance", maps: ["data:write"]}
+  - {action: "rds:RebootDBInstance", maps: ["data:write"]}
+  - {action: "rds:CreateDBSnapshot", maps: ["data:write"]}
+  - {action: "rds:DeleteDBInstance", maps: ["data:delete"]}
+  - {action: "rds:DeleteDBCluster", maps: ["data:delete"]}
+  - {action: "rds:DeleteDBSnapshot", maps: ["data:delete"]}
+  - {action: "rds:*", maps: ["data:*"], expect: ["data:read", "data:write", "data:delete", "data:admin"]}
+  # --- data: dynamodb ---
+  - {action: "dynamodb:GetItem", maps: ["data:read"]}
+  - {action: "dynamodb:BatchGetItem", maps: ["data:read"]}
+  - {action: "dynamodb:Query", maps: ["data:read"]}
+  - {action: "dynamodb:Scan", maps: ["data:read"]}
+  - {action: "dynamodb:DescribeTable", maps: ["data:read"]}
+  - {action: "dynamodb:ListTables", maps: ["data:read"]}
+  - {action: "dynamodb:PutItem", maps: ["data:write"]}
+  - {action: "dynamodb:UpdateItem", maps: ["data:write"]}
+  - {action: "dynamodb:BatchWriteItem", maps: ["data:write"]}
+  - {action: "dynamodb:CreateTable", maps: ["data:write"]}
+  - {action: "dynamodb:UpdateTable", maps: ["data:write"]}
+  - {action: "dynamodb:DeleteItem", maps: ["data:delete"]}
+  - {action: "dynamodb:DeleteTable", maps: ["data:delete"]}
+  - {action: "dynamodb:*", maps: ["data:*"], expect: ["data:read", "data:write", "data:delete", "data:admin"]}
+  # --- security: kms ---
+  - {action: "kms:Decrypt", maps: ["security:read"]}
+  - {action: "kms:DescribeKey", maps: ["security:read"]}
+  - {action: "kms:GetPublicKey", maps: ["security:read"]}
+  - {action: "kms:ListKeys", maps: ["security:read"]}
+  - {action: "kms:ListAliases", maps: ["security:read"]}
+  - {action: "kms:Encrypt", maps: ["security:write"]}
+  - {action: "kms:GenerateDataKey", maps: ["security:write"]}
+  - {action: "kms:ReEncryptFrom", maps: ["security:write"]}
+  - {action: "kms:ReEncryptTo", maps: ["security:write"]}
+  - {action: "kms:Sign", maps: ["security:write"]}
+  - {action: "kms:CreateKey", maps: ["security:write"]}
+  - {action: "kms:CreateAlias", maps: ["security:write"]}
+  - {action: "kms:ScheduleKeyDeletion", maps: ["security:delete"]}
+  - {action: "kms:DeleteAlias", maps: ["security:delete"]}
+  - {action: "kms:DisableKey", maps: ["security:delete"]}
+  - {action: "kms:PutKeyPolicy", maps: ["security:admin"]}
+  - {action: "kms:CreateGrant", maps: ["security:admin"]}
+  - {action: "kms:EnableKey", maps: ["security:admin"]}
+  - {action: "kms:*", maps: ["security:*"], expect: ["security:read", "security:write", "security:delete", "security:admin"]}
+  # --- security: secretsmanager ---
+  - {action: "secretsmanager:GetSecretValue", maps: ["security:read"]}
+  - {action: "secretsmanager:DescribeSecret", maps: ["security:read"]}
+  - {action: "secretsmanager:ListSecrets", maps: ["security:read"]}
+  - {action: "secretsmanager:CreateSecret", maps: ["security:write"]}
+  - {action: "secretsmanager:PutSecretValue", maps: ["security:write"]}
+  - {action: "secretsmanager:UpdateSecret", maps: ["security:write"]}
+  - {action: "secretsmanager:RotateSecret", maps: ["security:write"]}
+  - {action: "secretsmanager:DeleteSecret", maps: ["security:delete"]}
+  - {action: "secretsmanager:PutResourcePolicy", maps: ["security:admin"]}
+  - {action: "secretsmanager:*", maps: ["security:*"], expect: ["security:read", "security:write", "security:delete", "security:admin"]}
+  # --- security: cloudwatch / logs ---
+  - {action: "cloudwatch:GetMetricData", maps: ["security:read"]}
+  - {action: "cloudwatch:GetMetricStatistics", maps: ["security:read"]}
+  - {action: "cloudwatch:ListMetrics", maps: ["security:read"]}
+  - {action: "cloudwatch:DescribeAlarms", maps: ["security:read"]}
+  - {action: "cloudwatch:PutMetricData", maps: ["security:write"]}
+  - {action: "cloudwatch:PutMetricAlarm", maps: ["security:write"]}
+  - {action: "cloudwatch:DeleteAlarms", maps: ["security:delete"]}
+  - {action: "cloudwatch:*", maps: ["security:*"], expect: ["security:read", "security:write", "security:delete", "security:admin"]}
+  - {action: "logs:DescribeLogGroups", maps: ["security:read"]}
+  - {action: "logs:DescribeLogStreams", maps: ["security:read"]}
+  - {action: "logs:GetLogEvents", maps: ["security:read"]}
+  - {action: "logs:FilterLogEvents", maps: ["security:read"]}
+  - {action: "logs:StartQuery", maps: ["security:read"]}
+  - {action: "logs:GetQueryResults", maps: ["security:read"]}
+  - {action: "logs:CreateLogGroup", maps: ["security:write"]}
+  - {action: "logs:CreateLogStream", maps: ["security:write"]}
+  - {action: "logs:PutLogEvents", maps: ["security:write"]}
+  - {action: "logs:PutRetentionPolicy", maps: ["security:write"]}
+  - {action: "logs:DeleteLogGroup", maps: ["security:delete"]}
+  - {action: "logs:DeleteLogStream", maps: ["security:delete"]}
+  - {action: "logs:*", maps: ["security:*"], expect: ["security:read", "security:write", "security:delete", "security:admin"]}
+  # --- network: vpc namespace (brief) and load balancing ---
+  - {action: "vpc:*", maps: ["network:*"], expect: ["network:read", "network:write", "network:delete", "network:admin"]}
+  - {action: "elasticloadbalancing:Describe*", maps: ["network:read"]}
+  - {action: "elasticloadbalancing:*", maps: ["network:*"], expect: ["network:read", "network:write", "network:delete", "network:admin"]}
+  # --- billing: aws-portal / billing / ce ---
+  - {action: "aws-portal:ViewBilling", maps: ["billing:read"]}
+  - {action: "aws-portal:ViewAccount", maps: ["billing:read"]}
+  - {action: "aws-portal:ViewUsage", maps: ["billing:read"]}
+  - {action: "aws-portal:ViewPaymentMethods", maps: ["billing:read"]}
+  - {action: "aws-portal:ModifyBilling", maps: ["billing:billing"]}
+  - {action: "aws-portal:ModifyAccount", maps: ["billing:billing"]}
+  - {action: "aws-portal:ModifyPaymentMethods", maps: ["billing:billing"]}
+  - {action: "aws-portal:*", maps: ["billing:*"], expect: ["billing:read", "billing:billing"]}
+  - {action: "billing:GetBillingData", maps: ["billing:read"]}
+  - {action: "billing:GetBillingDetails", maps: ["billing:read"]}
+  - {action: "billing:ListBillingViews", maps: ["billing:read"]}
+  - {action: "billing:UpdateBillingPreferences", maps: ["billing:billing"]}
+  - {action: "billing:PutContractInformation", maps: ["billing:billing"]}
+  - {action: "billing:*", maps: ["billing:*"], expect: ["billing:read", "billing:billing"]}
+  - {action: "ce:GetCostAndUsage", maps: ["billing:read"]}
+  - {action: "ce:GetCostForecast", maps: ["billing:read"]}
+  - {action: "ce:DescribeReport", maps: ["billing:read"]}
+  - {action: "ce:GetReservationUtilization", maps: ["billing:read"]}
+  - {action: "ce:CreateCostCategoryDefinition", maps: ["billing:billing"]}
+  - {action: "ce:UpdateCostCategoryDefinition", maps: ["billing:billing"]}
+  - {action: "ce:DeleteCostCategoryDefinition", maps: ["billing:billing"]}
+  - {action: "ce:*", maps: ["billing:*"], expect: ["billing:read", "billing:billing"]}
+  - {action: "payments:*", maps: ["billing:*"], expect: ["billing:read", "billing:billing"]}
+
+# AWS managed policies (SPEC §5.3). Resource is "*" in every one of them → scope_level global.
+# `admin` is reserved for unrestricted control; PowerUser-style policies get read/write/delete only
+# (SPEC §7 R4: "individually acceptable roles ... PowerUser / Contributor / Editor").
+managed_policies:
+  - name: AdministratorAccess
+    arn: arn:aws:iam::aws:policy/AdministratorAccess
+    scope_level: global
+    maps: ["*:admin", "identity:grant", "identity:impersonate"]
+    expect: ["compute:admin", "storage:admin", "network:admin", "identity:admin", "data:admin",
+             "security:admin", "billing:admin", "identity:grant", "identity:impersonate"]
+  - name: PowerUserAccess
+    arn: arn:aws:iam::aws:policy/PowerUserAccess
+    scope_level: global
+    maps: ["compute:read", "compute:write", "compute:delete",
+           "storage:read", "storage:write", "storage:delete",
+           "network:read", "network:write", "network:delete",
+           "data:read", "data:write", "data:delete",
+           "security:read", "security:write", "security:delete",
+           "billing:read", "billing:billing",
+           "identity:read", "identity:write"]
+  - name: ReadOnlyAccess
+    arn: arn:aws:iam::aws:policy/ReadOnlyAccess
+    scope_level: global
+    maps: ["*:read"]
+    expect: ["compute:read", "storage:read", "network:read", "identity:read", "data:read",
+             "security:read", "billing:read"]
+  - name: ViewOnlyAccess
+    arn: arn:aws:iam::aws:policy/job-function/ViewOnlyAccess
+    scope_level: global
+    maps: ["*:read"]
+    expect: ["compute:read", "storage:read", "network:read", "identity:read", "data:read",
+             "security:read", "billing:read"]
+  - name: SecurityAudit
+    arn: arn:aws:iam::aws:policy/SecurityAudit
+    scope_level: global
+    maps: ["*:read"]
+    expect: ["compute:read", "storage:read", "network:read", "identity:read", "data:read",
+             "security:read", "billing:read"]
+  - name: IAMFullAccess
+    arn: arn:aws:iam::aws:policy/IAMFullAccess
+    scope_level: global
+    maps: ["identity:admin", "identity:grant", "identity:impersonate", "identity:read"]
+  - name: IAMReadOnlyAccess
+    arn: arn:aws:iam::aws:policy/IAMReadOnlyAccess
+    scope_level: global
+    maps: ["identity:read"]
+  - name: AmazonS3FullAccess
+    arn: arn:aws:iam::aws:policy/AmazonS3FullAccess
+    scope_level: global
+    maps: ["storage:read", "storage:write", "storage:delete", "storage:admin"]
+  - name: AmazonS3ReadOnlyAccess
+    arn: arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess
+    scope_level: global
+    maps: ["storage:read"]
+  - name: AmazonEC2FullAccess
+    arn: arn:aws:iam::aws:policy/AmazonEC2FullAccess
+    scope_level: global
+    maps: ["compute:read", "compute:write", "compute:delete", "compute:admin",
+           "network:read", "network:write", "network:delete", "network:admin"]
+  - name: AmazonEC2ReadOnlyAccess
+    arn: arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess
+    scope_level: global
+    maps: ["compute:read", "network:read"]
+  - name: AmazonVPCFullAccess
+    arn: arn:aws:iam::aws:policy/AmazonVPCFullAccess
+    scope_level: global
+    maps: ["network:read", "network:write", "network:delete", "network:admin"]
+  - name: AmazonRDSFullAccess
+    arn: arn:aws:iam::aws:policy/AmazonRDSFullAccess
+    scope_level: global
+    maps: ["data:read", "data:write", "data:delete", "data:admin"]
+  - name: AmazonRDSReadOnlyAccess
+    arn: arn:aws:iam::aws:policy/AmazonRDSReadOnlyAccess
+    scope_level: global
+    maps: ["data:read"]
+  - name: AmazonDynamoDBFullAccess
+    arn: arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
+    scope_level: global
+    maps: ["data:read", "data:write", "data:delete", "data:admin"]
+  - name: AmazonDynamoDBReadOnlyAccess
+    arn: arn:aws:iam::aws:policy/AmazonDynamoDBReadOnlyAccess
+    scope_level: global
+    maps: ["data:read"]
+  - name: AWSLambda_FullAccess
+    arn: arn:aws:iam::aws:policy/AWSLambda_FullAccess
+    scope_level: global
+    maps: ["compute:read", "compute:write", "compute:delete", "compute:admin"]
+  - name: AWSLambda_ReadOnlyAccess
+    arn: arn:aws:iam::aws:policy/AWSLambda_ReadOnlyAccess
+    scope_level: global
+    maps: ["compute:read"]
+  - name: AWSBillingReadOnlyAccess
+    arn: arn:aws:iam::aws:policy/AWSBillingReadOnlyAccess
+    scope_level: global
+    maps: ["billing:read"]
+  - name: Billing
+    arn: arn:aws:iam::aws:policy/job-function/Billing
+    scope_level: global
+    maps: ["billing:read", "billing:billing"]
+  - name: CloudWatchReadOnlyAccess
+    arn: arn:aws:iam::aws:policy/CloudWatchReadOnlyAccess
+    scope_level: global
+    maps: ["security:read"]
+  - name: CloudWatchFullAccess
+    arn: arn:aws:iam::aws:policy/CloudWatchFullAccess
+    scope_level: global
+    maps: ["security:read", "security:write", "security:delete", "security:admin"]
+  - name: AWSCloudTrail_ReadOnlyAccess
+    arn: arn:aws:iam::aws:policy/AWSCloudTrail_ReadOnlyAccess
+    scope_level: global
+    maps: ["security:read"]
+  - name: AWSKeyManagementServicePowerUser
+    arn: arn:aws:iam::aws:policy/AWSKeyManagementServicePowerUser
+    scope_level: global
+    maps: ["security:read", "security:write"]
+  - name: SecretsManagerReadWrite
+    arn: arn:aws:iam::aws:policy/SecretsManagerReadWrite
+    scope_level: global
+    maps: ["security:read", "security:write", "security:delete"]

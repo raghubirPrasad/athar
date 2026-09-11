@@ -1,0 +1,121 @@
+name: athar
+
+x-api-env: &api-env
+  DATABASE_URL: postgresql+psycopg://athar:${POSTGRES_PASSWORD:-athar}@db:5432/athar
+  LEDGER_RPC_URL: http://anvil:8545
+  # The `local-llm` profile's container by default. Point it at an Ollama already running on
+  # the host with OLLAMA_URL_DOCKER=http://host.docker.internal:11434 in .env.
+  OLLAMA_URL: ${OLLAMA_URL_DOCKER:-http://ollama:11434}
+  ATHAR_DATA_DIR: /app/data
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: athar
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-athar}
+      POSTGRES_DB: athar
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "${POSTGRES_HOST_PORT:-5432}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U athar -d athar"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  anvil:
+    image: ghcr.io/foundry-rs/foundry:v1.5.1
+    entrypoint: ["anvil"]
+    command: ["--host", "0.0.0.0", "--chain-id", "31337", "--block-time", "1", "--state", "/data/anvil-state.json"]
+    volumes:
+      - anvildata:/data
+    ports:
+      - "${ANVIL_HOST_PORT:-8545}:8545"
+    healthcheck:
+      test: ["CMD-SHELL", "cast block-number --rpc-url http://127.0.0.1:8545 >/dev/null 2>&1 || exit 1"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  api:
+    # No image is published yet, so there is nothing to pull: compose builds from `build:`
+    # below and `make up` passes `--build`. When the repository goes public, CI's
+    # `publish-images` job pushes `ghcr.io/<owner>/athar-api:latest` and an `image:` line
+    # naming it goes here.
+    build:
+      context: ./backend
+    # The image runs as its own uid 10001, which is right for everything it ships. The ./data bind
+    # mount is the exception: it belongs to the host, and on Linux Docker creates it owned by root
+    # when it does not exist, leaving the container unable to write the estate it is about to
+    # generate. `make up` passes the calling user's ids; the default keeps the image's own user for
+    # anyone running `docker compose` directly with data/ already writable.
+    user: "${ATHAR_UID:-10001}:${ATHAR_GID:-10001}"
+    env_file: .env
+    environment:
+      <<: *api-env
+    volumes:
+      - ./data:/app/data
+    ports:
+      - "${API_HOST_PORT:-8000}:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      anvil:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/api/v1/health', timeout=2).status==200 else 1)"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
+
+  web:
+    # As for `api`: built locally until `publish-images` has pushed
+    # `ghcr.io/<owner>/athar-web:latest`.
+    build:
+      context: ./frontend
+    ports:
+      - "${WEB_HOST_PORT:-8080}:80"
+    depends_on:
+      api:
+        condition: service_healthy
+
+  ollama:
+    # Ships with no models. Pull the one SPEC §18.1 names, once, after the service is up:
+    #   docker compose --profile local-llm exec ollama ollama pull qwen3:8b
+    # It is a multi-gigabyte download and it is kept out of `up` on purpose: a pull step inside
+    # the service would block `--wait` for minutes and fail the whole profile on a flaky network.
+    # Until it is pulled, `/api/chat` answers 404 and the agent layer falls back to templates
+    # (SPEC §11.2) — degraded, never broken. See docs/DEPLOY.md "Optional: the local LLM profile".
+    image: ollama/ollama:latest
+    profiles: ["local-llm"]
+    volumes:
+      - ollama:/root/.ollama
+    ports:
+      - "11434:11434"
+
+  caddy:
+    image: caddy:2-alpine
+    profiles: ["public"]
+    # Named explicitly rather than `env_file: .env`: the Caddyfile needs exactly one value, and
+    # the API's env file also carries JWT_SECRET and LEDGER_PRIVATE_KEY. Without this the site
+    # block `{$PUBLIC_HOSTNAME:localhost}` always falls back to `localhost` and Caddy issues a
+    # self-signed certificate for it (docs/DEPLOY.md §1).
+    environment:
+      PUBLIC_HOSTNAME: ${PUBLIC_HOSTNAME:-localhost}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddydata:/data
+    depends_on:
+      - web
+
+volumes:
+  pgdata:
+  anvildata:
+  ollama:
+  caddydata:

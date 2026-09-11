@@ -1,0 +1,5 @@
+[
+  {"ref": "//storage.googleapis.com/projects/_/buckets/nda-citizen-lake", "service": "storage", "region": "me-central1", "sensitivity": "high", "project": "nda-analytics-prod"},
+  {"ref": "//bigquery.googleapis.com/projects/nda-analytics-prod/datasets/citizen_events", "service": "bigquery", "region": "me-central1", "sensitivity": "high", "project": "nda-analytics-prod"},
+  {"ref": "//storage.googleapis.com/projects/_/buckets/nda-sandbox-scratch", "service": "storage", "region": "europe-west1", "sensitivity": "low", "project": "nda-sandbox"}
+]

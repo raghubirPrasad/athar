@@ -1,0 +1,4 @@
+project_id,name,department,status,retired_month,cloud,project_ref
+prj-analytics,Citizen Analytics,Data Services,active,,gcp,nda-analytics-prod
+prj-payments,Payments Platform,Finance,active,,azure,rg-payments-prod
+prj-legacy,Legacy Portal,Smart Services,retired,1,aws,legacy-portal

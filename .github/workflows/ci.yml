@@ -1,0 +1,137 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  ATHAR_DEV: "true"
+  LLM_PROVIDER: none
+  DATABASE_URL: postgresql+psycopg://athar:athar@localhost:5432/athar
+  LEDGER_RPC_URL: http://localhost:8545
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with: { version: "0.8.x" }
+      - uses: actions/setup-node@v4
+        with: { node-version: "22", cache: npm, cache-dependency-path: frontend/package-lock.json }
+      - uses: foundry-rs/foundry-toolchain@v1
+        with: { version: v1.5.1 }
+      - run: cd backend && uv sync --all-groups --frozen
+      - run: cd backend && uv run ruff format --check . && uv run ruff check . && uv run mypy athar
+      - run: cd frontend && npm ci --no-audit --no-fund && npm run lint && npm run typecheck
+      - run: cd contracts && forge fmt --check
+
+  backend-tests:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env: { POSTGRES_USER: athar, POSTGRES_PASSWORD: athar, POSTGRES_DB: athar }
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U athar -d athar" --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with: { version: "0.8.x" }
+      - uses: foundry-rs/foundry-toolchain@v1
+        with: { version: v1.5.1 }
+      - name: Start anvil
+        run: anvil --port 8545 --chain-id 31337 --block-time 1 > /tmp/anvil.log 2>&1 &
+      - run: cd backend && uv sync --all-groups --frozen
+      - run: cd backend && uv run pytest -q -m "not slow"
+
+  contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: foundry-rs/foundry-toolchain@v1
+        with: { version: v1.5.1 }
+      - run: cd contracts && forge build --sizes && forge test -vv
+      - name: Artifact in sync
+        run: |
+          python3 scripts/sync_contract_artifact.py
+          git diff --exit-code -- backend/athar/ledger/artifacts/
+
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: "22", cache: npm, cache-dependency-path: frontend/package-lock.json }
+      - run: cd frontend && npm ci --no-audit --no-fund
+      - run: cd frontend && npm run typecheck && npm run test && npm run build
+
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: astral-sh/setup-uv@v5
+        with: { version: "0.8.x" }
+      - uses: actions/setup-node@v4
+        with: { node-version: "22" }
+      # No `|| true`: this step is allowed to fail the build, which is the whole point of --strict.
+      # The audit runs against the exported lock rather than the installed environment because
+      # `athar` itself is not on PyPI and --strict refuses to skip an unauditable distribution.
+      # --ignore-vuln PYSEC-2026-1845: pytest's predictable `/tmp/pytest-of-{user}` directory, a
+      # local DoS / privilege issue on a shared UNIX host. It is a dev-group dependency (the
+      # runtime image installs no dev group, so it ships in nothing), and the fix is pytest 9.0.3,
+      # above the `pytest>=8.3,<9` pin in pyproject.toml. Drop the ignore when that pin moves.
+      - name: Audit pinned Python dependencies
+        run: |
+          cd backend
+          uv sync --all-groups --frozen
+          uv export --frozen --all-groups --no-emit-project > "$RUNNER_TEMP/requirements-audit.txt"
+          uv run pip-audit --strict --desc on --require-hashes \
+            -r "$RUNNER_TEMP/requirements-audit.txt" --ignore-vuln PYSEC-2026-1845
+      # Audits devDependencies too, not just what the `web` image ships. The image is
+      # `nginx:1.27-alpine` serving `dist/`, so a dev-only advisory cannot reach a visitor — but it
+      # can reach whoever builds this, and the toolchain is pinned high enough that there is no
+      # reason to look away. `vitest ^5` carries a vite 6.x that fixes GHSA-fx2h-pf6j-xcff, and is
+      # itself past GHSA-5xrq-8626-4rwp. If a future advisory has no fix inside the pinned majors,
+      # narrow this with `--omit=dev` and say here which advisory and why.
+      - run: cd frontend && npm ci --no-audit --no-fund && npm audit --audit-level=high
+      - uses: gitleaks/gitleaks-action@v2
+        env: { GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}" }
+
+  compose-config:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: cp .env.example .env && docker compose config -q
+
+  eval:
+    runs-on: ubuntu-latest
+    needs: [backend-tests]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with: { version: "0.8.x" }
+      - run: cd backend && uv sync --all-groups --frozen
+      - name: Precision / recall gates on the sample estates, regenerated here (seeds 42 and 7)
+        run: cd backend && uv run athar eval --sample 42 --gate && uv run athar eval --sample 7 --gate
+
+  publish-images:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [lint, backend-tests, contracts, frontend, security, compose-config, eval]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with: { registry: ghcr.io, username: "${{ github.actor }}", password: "${{ secrets.GITHUB_TOKEN }}" }
+      - uses: docker/build-push-action@v6
+        with: { context: ./backend, push: true, tags: "ghcr.io/${{ github.repository_owner }}/athar-api:latest" }
+      - uses: docker/build-push-action@v6
+        with: { context: ./frontend, push: true, tags: "ghcr.io/${{ github.repository_owner }}/athar-web:latest" }

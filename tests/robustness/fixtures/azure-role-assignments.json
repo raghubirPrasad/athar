@@ -1,0 +1,13 @@
+[
+  {
+    "id": "/subscriptions/11111111-1111-4111-8111-111111111111/providers/Microsoft.Authorization/roleAssignments/bbbbbbbb-0001-4000-8000-000000000001",
+    "name": "bbbbbbbb-0001-4000-8000-000000000001",
+    "principalId": "aaaaaaaa-0001-4000-8000-000000000001",
+    "principalName": "a.person@nda.example",
+    "principalType": "User",
+    "roleDefinitionId": "/subscriptions/11111111-1111-4111-8111-111111111111/providers/Microsoft.Authorization/roleDefinitions/8e3af657-a8ff-443c-a75c-2fe8c4bcb635",
+    "roleDefinitionName": "Owner",
+    "scope": "/subscriptions/11111111-1111-4111-8111-111111111111",
+    "type": "Microsoft.Authorization/roleAssignments"
+  }
+]

@@ -1,0 +1,18 @@
+{
+  "bindings": [
+    {
+      "members": [
+        "user:a.person@nda.example"
+      ],
+      "role": "roles/nonexistent.customThing"
+    },
+    {
+      "members": [
+        "user:a.person@nda.example"
+      ],
+      "role": "organizations/1234/roles/CustomBillingReader"
+    }
+  ],
+  "etag": "BwXhEXAMPLE=",
+  "version": 1
+}

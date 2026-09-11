@@ -1,0 +1,36 @@
+{
+  "AnotherFutureField": 42,
+  "GroupDetailList": [],
+  "IsTruncated": false,
+  "Policies": [],
+  "RoleDetailList": [],
+  "UserDetailList": [
+    {
+      "Arn": "arn:aws:iam::123456789012:user/a.person",
+      "AttachedManagedPolicies": [
+        {
+          "PolicyArn": "arn:aws:iam::aws:policy/ReadOnlyAccess",
+          "PolicyName": "ReadOnlyAccess"
+        }
+      ],
+      "CreateDate": "2025-09-05T09:00:00Z",
+      "GroupList": [],
+      "SomeFutureField": {
+        "nested": [
+          "value",
+          1,
+          null
+        ]
+      },
+      "Tags": [
+        {
+          "Key": "department",
+          "Value": "Finance"
+        }
+      ],
+      "UserId": "AIDAEXAMPLE00000001",
+      "UserName": "a.person",
+      "UserPolicyList": []
+    }
+  ]
+}

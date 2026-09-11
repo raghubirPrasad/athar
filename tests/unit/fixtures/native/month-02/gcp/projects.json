@@ -1,0 +1,4 @@
+[
+  {"projectId": "nda-analytics-prod", "name": "Citizen Analytics", "projectNumber": "100000000001", "lifecycleState": "ACTIVE", "labels": {"region": "me-central1", "department": "data-services", "owner": "fatima.saeed@nda.example"}},
+  {"projectId": "nda-sandbox", "name": "Sandbox", "projectNumber": "100000000002", "lifecycleState": "ACTIVE", "labels": {"region": "europe-west1", "department": "platform-engineering"}}
+]

@@ -1,0 +1,6 @@
+[
+  {"arn": "arn:aws:s3:::nda-citizen-data", "service": "s3", "region": "me-central-1", "sensitivity": "high", "project": "123456789012"},
+  {"arn": "arn:aws:s3:::nda-finance-reports", "service": "s3", "region": "me-central-1", "sensitivity": "low", "project": "123456789012"},
+  {"arn": "arn:aws:dynamodb:me-central-1:123456789012:table/finance-ledger", "service": "dynamodb", "region": "me-central-1", "sensitivity": "high", "project": "123456789012"},
+  {"arn": "arn:aws:s3:::nda-backup-eu", "service": "s3", "region": "eu-west-1", "sensitivity": "high", "project": "123456789012"}
+]

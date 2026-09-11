@@ -1,0 +1,35 @@
+[
+  {
+    "id": "aaaaaaaa-0001-4000-8000-000000000001",
+    "userPrincipalName": "aisha.almansoori@nda.example",
+    "displayName": "Aisha Al Mansoori",
+    "accountEnabled": true,
+    "department": "Finance",
+    "signInActivity": {"lastSignInDateTime": "2025-09-26T05:30:00Z", "lastNonInteractiveSignInDateTime": "2025-09-29T01:00:00Z"}
+  },
+  {
+    "id": "aaaaaaaa-0003-4000-8000-000000000003",
+    "userPrincipalName": "fatima.saeed@nda.example",
+    "displayName": "Fatima Saeed",
+    "accountEnabled": true,
+    "department": "Data Services",
+    "signInActivity": {"lastSignInDateTime": "2025-06-01T09:00:00Z", "lastNonInteractiveSignInDateTime": null}
+  },
+  {
+    "id": "aaaaaaaa-0005-4000-8000-000000000005",
+    "userPrincipalName": "layla.hassan@nda.example",
+    "displayName": "Layla Hassan",
+    "accountEnabled": true,
+    "department": "Cyber Security",
+    "signInActivity": {"lastSignInDateTime": "2025-09-28T12:00:00Z"},
+    "mfaEnforced": true
+  },
+  {
+    "id": "aaaaaaaa-0009-4000-8000-000000000009",
+    "userPrincipalName": "khalid.alnuaimi@nda.example",
+    "displayName": "Khalid Al Nuaimi",
+    "accountEnabled": true,
+    "department": "Finance",
+    "signInActivity": {"lastSignInDateTime": "2025-09-22T12:00:00Z"}
+  }
+]

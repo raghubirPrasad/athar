@@ -1,0 +1,27 @@
+{
+  "GroupDetailList": [],
+  "Policies": [],
+  "RoleDetailList": [],
+  "UserDetailList": [
+    {
+      "Arn": "arn:aws:iam::123456789012:user/a.person",
+      "AttachedManagedPolicies": [],
+      "CreateDate": "2025-09-05T09:00:00Z",
+      "GroupList": [],
+      "Tags": [],
+      "UserId": "AIDAEXAMPLE00000001",
+      "UserName": "a.person",
+      "UserPolicyList": []
+    },
+    {
+      "Arn": "arn:aws:iam::123456789012:user/a.person",
+      "AttachedManagedPolicies": [],
+      "CreateDate": "2025-09-05T09:00:00Z",
+      "GroupList": [],
+      "Tags": [],
+      "UserId": "AIDAEXAMPLE00000002",
+      "UserName": "a.person",
+      "UserPolicyList": []
+    }
+  ]
+}

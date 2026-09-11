@@ -1,0 +1,10 @@
+# Public profile: automatic TLS in front of the web container (SPEC §18.5).
+{$PUBLIC_HOSTNAME:localhost} {
+	encode gzip
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options nosniff
+		Referrer-Policy strict-origin-when-cross-origin
+	}
+	reverse_proxy web:80
+}
