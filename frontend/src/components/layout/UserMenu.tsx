@@ -40,11 +40,11 @@ export function UserMenu() {
         aria-expanded={open}
         aria-haspopup="menu"
         className={cn(
-          "inline-flex items-center gap-2 rounded-md border border-border px-2 py-1 text-[13px] transition-colors hover:bg-surface-muted",
-          open && "bg-surface-muted",
+          "inline-flex items-center gap-2 rounded-md border border-chrome-border px-2 py-1 text-[13px] text-chrome-fg-muted transition-colors hover:bg-chrome-2",
+          open && "bg-chrome-2",
         )}
       >
-        <span className="hidden max-w-[16ch] truncate text-fg sm:inline">{user.email}</span>
+        <span className="hidden max-w-[16ch] truncate text-chrome-fg sm:inline">{user.email}</span>
         <Badge tone="accent">{roleLabel}</Badge>
         <IconChevron size={14} />
       </button>

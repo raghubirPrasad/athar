@@ -1,0 +1,114 @@
+{
+  "source": "Cloudsplaining example estate (Salesforce, BSD-3) \u2014 native aws get-account-authorization-details; account IDs sanitised to 012345678901",
+  "generated_at": "2026-09-16T18:24:18+00:00",
+  "file_bytes": 823925,
+  "principals": 122,
+  "grants": 1124,
+  "unmapped_actions": 2512,
+  "findings_total": 318,
+  "identities_flagged": 122,
+  "by_severity": {
+    "Critical": 0,
+    "High": 90,
+    "Medium": 147,
+    "Low": 81
+  },
+  "rules": [
+    {
+      "rule_id": "R0",
+      "name": "Unmapped permission",
+      "severity": "Low",
+      "count": 45
+    },
+    {
+      "rule_id": "R1",
+      "name": "Wildcard / admin privilege",
+      "severity": "High",
+      "count": 17
+    },
+    {
+      "rule_id": "R2",
+      "name": "Dormant access",
+      "severity": "Medium",
+      "count": 25
+    },
+    {
+      "rule_id": "R5",
+      "name": "Toxic combination",
+      "severity": "High",
+      "count": 73
+    },
+    {
+      "rule_id": "R7",
+      "name": "Peer outlier",
+      "severity": "Low",
+      "count": 36
+    },
+    {
+      "rule_id": "R10",
+      "name": "Unowned principal",
+      "severity": "Medium",
+      "count": 122
+    }
+  ],
+  "samples": [
+    {
+      "rule_id": "R1",
+      "name": "AWS-QuickSetup-StackSet-Local-ExecutionRole"
+    },
+    {
+      "rule_id": "R1",
+      "name": "OrganizationAccountAccessRole"
+    },
+    {
+      "rule_id": "R1",
+      "name": "AWSReservedSSO_AdministratorAccess_dc6414f7f2ab04fc"
+    },
+    {
+      "rule_id": "R1",
+      "name": "fn4-exploitableNotAction-role"
+    },
+    {
+      "rule_id": "R1",
+      "name": "fp1-allow-and-deny-role"
+    },
+    {
+      "rule_id": "R1",
+      "name": "fp2-allow-and-deny-multiple-policies-role"
+    },
+    {
+      "rule_id": "R1",
+      "name": "privesc-AssumeRole-ending-role"
+    },
+    {
+      "rule_id": "R1",
+      "name": "privesc-high-priv-service-role"
+    },
+    {
+      "rule_id": "R1",
+      "name": "privesc-sre-role"
+    },
+    {
+      "rule_id": "R1",
+      "name": "stacksets-exec-b5520cb2730c2f54b523d6375a319abb"
+    },
+    {
+      "rule_id": "R1",
+      "name": "biden"
+    },
+    {
+      "rule_id": "R1",
+      "name": "fn4-exploitableNotAction-user"
+    },
+    {
+      "rule_id": "R1",
+      "name": "fp1-allow-and-deny-user"
+    },
+    {
+      "rule_id": "R1",
+      "name": "fp2-allow-and-deny-multiple-policies-user"
+    }
+  ],
+  "r7_real": 36,
+  "r7_synthetic": 0
+}

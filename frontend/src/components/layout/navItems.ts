@@ -6,6 +6,7 @@ import {
   IconLedger,
   IconOverview,
   IconRemediation,
+  IconScan,
   IconSettings,
   IconTimeline,
 } from "../icons";
@@ -29,5 +30,6 @@ export const NAV_ITEMS: readonly NavItem[] = [
   { to: "/ledger", label: "Ledger", hint: "Anchored scans and decisions", icon: IconLedger },
   { to: "/timeline", label: "Timeline", hint: "Twelve months of drift", icon: IconTimeline },
   { to: "/evaluation", label: "Evaluation", hint: "Precision and recall against ground truth", icon: IconEvaluation },
+  { to: "/real-export", label: "Real export", hint: "The engine run over a real AWS IAM export", icon: IconScan },
   { to: "/settings", label: "Settings", hint: "Thresholds, regions, auto-remediation", icon: IconSettings },
 ];

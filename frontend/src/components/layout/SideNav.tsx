@@ -30,8 +30,8 @@ export function SideNav({ expanded = false, onNavigate, className }: SideNavProp
                 "flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-[13px] font-medium transition-colors",
                 expanded ? "justify-start" : "justify-center lg:justify-start",
                 isActive
-                  ? "bg-accent-soft text-accent-strong"
-                  : "text-fg-muted hover:bg-surface-muted hover:text-fg",
+                  ? "bg-chrome-accent-soft font-medium text-chrome-accent [box-shadow:inset_2px_0_0_var(--chrome-accent)]"
+                  : "text-chrome-fg-muted hover:bg-chrome-2 hover:text-chrome-fg",
               )
             }
           >

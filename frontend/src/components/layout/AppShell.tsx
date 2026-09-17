@@ -25,10 +25,11 @@ export function AppShell() {
 
   return (
     <div className="min-h-screen bg-bg text-fg">
+      <div className="brand-rule h-[3px] w-full" aria-hidden="true" />
       <TopBar summary={summary.data} onOpenNav={() => setNavOpen(true)} />
 
       <div className="flex">
-        <aside className="sticky top-12 hidden h-[calc(100vh-3rem)] shrink-0 border-r border-border bg-surface md:block md:w-14 lg:w-52">
+        <aside className="chrome sticky top-14 hidden h-[calc(100vh-3.5rem)] shrink-0 border-r border-chrome-border md:block md:w-14 lg:w-56">
           <SideNav />
         </aside>
 
@@ -39,14 +40,14 @@ export function AppShell() {
               className="absolute inset-0 bg-[rgb(16_24_40/0.45)]"
               onClick={() => setNavOpen(false)}
             />
-            <div className="relative h-full w-60 border-r border-border bg-surface shadow-card">
-              <div className="flex items-center justify-between border-b border-border px-3 py-2">
-                <span className="text-xs font-semibold uppercase tracking-wide text-fg-muted">Sections</span>
+            <div className="chrome relative h-full w-60 border-r border-chrome-border shadow-card">
+              <div className="flex items-center justify-between border-b border-chrome-border px-3 py-2">
+                <span className="text-xs font-semibold uppercase tracking-wide text-chrome-fg-muted">Sections</span>
                 <button
                   type="button"
                   onClick={() => setNavOpen(false)}
                   aria-label="Close navigation"
-                  className="rounded px-1.5 text-fg-muted hover:text-fg"
+                  className="rounded px-1.5 text-chrome-fg-muted hover:text-chrome-fg"
                 >
                   ✕
                 </button>

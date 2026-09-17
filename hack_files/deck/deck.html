@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ATHAR — GISEC final</title>
+<style>
+  @font-face { font-family:"IBM Plex Sans"; font-weight:400; src:url("fonts/ibm-plex-sans-400.woff2") format("woff2"); font-display:swap; }
+  @font-face { font-family:"IBM Plex Sans"; font-weight:500; src:url("fonts/ibm-plex-sans-500.woff2") format("woff2"); font-display:swap; }
+  @font-face { font-family:"IBM Plex Sans"; font-weight:600; src:url("fonts/ibm-plex-sans-600.woff2") format("woff2"); font-display:swap; }
+  @font-face { font-family:"IBM Plex Sans"; font-weight:700; src:url("fonts/ibm-plex-sans-700.woff2") format("woff2"); font-display:swap; }
+  @font-face { font-family:"Cascadia Mono"; font-weight:400; src:url("fonts/cascadia-mono-400.woff2") format("woff2"); font-display:swap; }
+  @font-face { font-family:"Cascadia Mono"; font-weight:600; src:url("fonts/cascadia-mono-600.woff2") format("woff2"); font-display:swap; }
+
+  :root{
+    --bg:#0c1116; --panel:#131c25; --panel-2:#0f171f; --border:#233240; --border-2:#2f4252;
+    --fg:#eaf1f7; --muted:#9db0c0; --faint:#6f8496;
+    --cyan:#27c6df; --cyan-deep:#0b7c93; --cyan-soft:#0f2b34;
+    --crit:#ff6a5e; --high:#ffab5c; --med:#ffd666; --low:#7ba7ff; --ok:#48d597;
+    --sans:"Segoe UI Variable Text","Segoe UI","IBM Plex Sans",-apple-system,Arial,sans-serif;
+    --mono:"Cascadia Mono","Cascadia Code",Consolas,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{background:#05080b;font-family:var(--sans);color:var(--fg);overflow:hidden}
+
+  #viewport{position:fixed;inset:0;display:grid;place-items:center}
+  #stage{width:1280px;height:720px;position:relative;transform-origin:center center}
+
+  .slide{position:absolute;inset:0;background:
+      radial-gradient(1200px 500px at 82% -12%, rgba(39,198,223,.10), transparent 60%),
+      radial-gradient(900px 500px at -8% 115%, rgba(11,124,147,.14), transparent 55%),
+      var(--bg);
+    padding:64px 72px;display:none;flex-direction:column;overflow:hidden}
+  .slide.active{display:flex}
+  .slide::before{content:"";position:absolute;left:0;right:0;top:0;height:3px;
+    background:linear-gradient(90deg,var(--cyan-deep),#1596b0 45%,var(--cyan))}
+
+  /* header + footer chrome */
+  .kicker{font:600 12px/1 var(--mono);letter-spacing:.28em;text-transform:uppercase;color:var(--cyan);margin-bottom:14px}
+  h1{font-size:52px;font-weight:700;letter-spacing:-.02em;line-height:1.02}
+  h2{font-size:34px;font-weight:600;letter-spacing:-.015em;line-height:1.08}
+  h3{font-size:19px;font-weight:600}
+  p{color:var(--muted);font-size:17px;line-height:1.5}
+  .lead{font-size:20px;color:var(--fg);line-height:1.45;max-width:60ch}
+  .mono{font-family:var(--mono)}
+  .foot{position:absolute;left:72px;right:72px;bottom:26px;display:flex;justify-content:space-between;
+    align-items:center;font:500 11px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--faint)}
+  .foot .mark{display:flex;align-items:center;gap:9px;color:var(--muted)}
+  .pageno{color:var(--faint)}
+
+  .mark svg{display:block}
+  .wordmark{font-weight:700;letter-spacing:.24em;font-size:13px;color:var(--fg)}
+
+  /* primitives */
+  .grid{display:grid;gap:18px}
+  .panel{background:linear-gradient(180deg,var(--panel),var(--panel-2));border:1px solid var(--border);
+    border-radius:12px;padding:22px}
+  .panel .seam{height:2px;width:34px;background:var(--cyan);border-radius:2px;margin-bottom:14px}
+  .stat{font-size:44px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1}
+  .stat.cyan{color:var(--cyan)} .stat.crit{color:var(--crit)}
+  .statlabel{font:600 11px/1 var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--faint);margin-bottom:12px}
+  .stathint{color:var(--muted);font-size:13.5px;margin-top:10px;line-height:1.4}
+  .chip{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--border-2);border-radius:999px;
+    padding:5px 12px;font:600 12px/1 var(--mono);color:var(--muted)}
+  .chip.cyan{border-color:rgba(39,198,223,.45);color:var(--cyan);background:var(--cyan-soft)}
+  .dot{width:7px;height:7px;border-radius:50%}
+  .frame{border:1px solid var(--border-2);border-radius:10px;overflow:hidden;background:#0a0f14;
+    box-shadow:0 24px 60px rgba(0,0,0,.5)}
+  .frame .bar{height:26px;background:#0f1720;border-bottom:1px solid var(--border);display:flex;
+    align-items:center;gap:6px;padding:0 12px}
+  .frame .bar i{width:8px;height:8px;border-radius:50%;background:#2a3a48;display:block}
+  .frame img{display:block;width:100%}
+  ul.clean{list-style:none;display:flex;flex-direction:column;gap:13px}
+  ul.clean li{position:relative;padding-left:24px;color:var(--fg);font-size:16.5px;line-height:1.45}
+  ul.clean li::before{content:"";position:absolute;left:0;top:8px;width:9px;height:9px;border-radius:2px;
+    background:var(--cyan);transform:rotate(45deg)}
+  ul.clean li b{color:#fff} ul.clean li span{color:var(--muted)}
+  .tag{font:600 11px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;padding:4px 9px;border-radius:5px}
+  .t-high{color:#1b1205;background:var(--high)} .t-low{color:#0a1428;background:var(--low)}
+  .t-med{color:#241b02;background:var(--med)} .t-crit{color:#2a0704;background:var(--crit)}
+  table.data{width:100%;border-collapse:collapse;font-size:15px}
+  table.data th{text-align:left;font:600 11px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;
+    color:var(--faint);padding:0 10px 12px;border-bottom:1px solid var(--border)}
+  table.data td{padding:11px 10px;border-bottom:1px solid rgba(35,50,64,.6);color:var(--fg)}
+  table.data td.n{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums}
+  .arrow{color:var(--cyan);font-family:var(--mono)}
+
+  /* hint bar */
+  #hint{position:fixed;bottom:12px;left:50%;transform:translateX(-50%);z-index:50;
+    font:500 11px/1 var(--mono);letter-spacing:.12em;color:#5f7484;background:rgba(10,15,20,.7);
+    border:1px solid #1e2b36;border-radius:999px;padding:8px 14px;text-transform:uppercase}
+  #hint.hide{display:none}
+
+  @media print{
+    @page{size:1280px 720px;margin:0}
+    body{overflow:visible}
+    #viewport{position:static;display:block}
+    #stage{transform:none!important;width:1280px;height:720px}
+    .slide{display:flex!important;page-break-after:always;position:relative}
+    #hint{display:none}
+  }
+</style>
+</head>
+<body>
+<div id="viewport"><div id="stage">
+
+<!-- 1 · TITLE -->
+<section class="slide active" data-note="Government estates run across three clouds. Every hire, every role change, every incident grants access — and it is almost never taken away. ATHAR is a multi-cloud access-governance console that makes that drift visible, measurable and provable. We scored 100 out of 100 in the case round; this is what we built.">
+  <div style="margin:auto 0">
+    <div class="mark" style="margin-bottom:34px">
+      <svg width="46" height="46" viewBox="0 0 24 24" fill="none"><circle cx="8" cy="12" r="2.4" fill="var(--cyan)"/><path d="M13 6.5a8 8 0 0 1 0 11" stroke="var(--cyan)" stroke-width="1.7" stroke-linecap="round" opacity=".85"/><path d="M16.5 4a12 12 0 0 1 0 16" stroke="var(--cyan)" stroke-width="1.7" stroke-linecap="round" opacity=".45"/></svg>
+    </div>
+    <div class="wordmark" style="font-size:22px;margin-bottom:22px">A T H A R</div>
+    <h1>Multi-cloud access governance,<br>measured and <span style="color:var(--cyan)">provable</span>.</h1>
+    <p class="lead" style="margin-top:22px">One model across AWS, Azure and GCP. Risk scored by measured blast radius,
+      every finding backed by evidence, every scan anchored to a ledger a regulator can verify without trusting us.</p>
+    <div style="display:flex;gap:12px;margin-top:32px">
+      <span class="chip cyan"><span class="dot" style="background:var(--cyan)"></span>Case round: 100 / 100</span>
+      <span class="chip">Nahar Digital Authority · demo estate</span>
+      <span class="chip">GISEC · School of Cyber Defence</span>
+    </div>
+  </div>
+  <div class="foot"><span class="mark"><span class="wordmark">ATHAR</span></span><span class="pageno">Every permission leaves a trace</span></div>
+</section>
+
+<!-- 2 · PROBLEM -->
+<section class="slide" data-note="Here is the problem in one screen. A government body runs a hybrid estate across several clouds. Permissions drift: people keep access after they change roles, service accounts outlive the projects they were built for, and nobody has one view of who can do what. The finding that matters most — one person holding administrative power in all three clouds at once — does not exist inside any single provider's console. A quarterly spreadsheet review looks at people one at a time and misses it every single quarter.">
+  <div class="kicker">The problem</div>
+  <h2>Three consoles. Three answers. No one view.</h2>
+  <p class="lead" style="margin-top:16px">Permissions drift faster than anyone revokes them — and the riskiest identity is invisible to every single cloud.</p>
+  <div class="grid" style="grid-template-columns:repeat(3,1fr);margin-top:38px">
+    <div class="panel"><div class="seam"></div><h3>Access only accumulates</h3><p style="margin-top:8px">Granted at every hire, role change and incident. Almost never taken away.</p></div>
+    <div class="panel"><div class="seam"></div><h3>Service accounts outlive projects</h3><p style="margin-top:8px">The estate does not know a person left in March, or a project shut in June.</p></div>
+    <div class="panel" style="border-color:rgba(255,106,94,.4)"><div class="seam" style="background:var(--crit)"></div><h3 style="color:var(--crit)">Cross-cloud superuser</h3><p style="margin-top:8px">Admin in AWS <span class="arrow">+</span> Azure <span class="arrow">+</span> GCP. In no single console. Spreadsheet reviews miss it every quarter.</p></div>
+  </div>
+  <div class="panel" style="margin-top:26px;display:flex;align-items:center;gap:22px;border-color:var(--border-2)">
+    <div class="stat crit">507</div>
+    <div><h3>identities across three clouds in the demo estate</h3><p style="margin-top:4px">382 people · 125 service accounts · twelve months of simulated drift. Who, exactly, can do what?</p></div>
+  </div>
+  <div class="foot"><span class="mark"><span class="wordmark">ATHAR</span></span><span class="pageno">02</span></div>
+</section>
+
+<!-- 3 · WHAT IT IS -->
+<section class="slide" data-note="ATHAR ingests the native IAM exports from all three clouds, plus the HR feed, and normalises everything into one permission model. It links the same person across three different identifier schemes. Then it scores every identity — not by a number we invented, but by measured blast radius: the share of the estate that identity can actually reach across all three clouds.">
+  <div class="kicker">What ATHAR is</div>
+  <h2>Native exports in. One canonical model out.</h2>
+  <div class="grid" style="grid-template-columns:1.05fr .95fr;margin-top:34px;align-items:center">
+    <div>
+      <div class="mono" style="font-size:14px;line-height:2.1;color:var(--muted)">
+        <div><span style="color:var(--high)">aws</span> authorization-details &nbsp;<span class="arrow">┐</span></div>
+        <div><span style="color:var(--low)">azure</span> role-assignments &nbsp;&nbsp;&nbsp;<span class="arrow">├─▶</span> <b style="color:var(--fg)">Normalise + link</b></div>
+        <div><span style="color:var(--ok)">gcp</span> iam-policy bindings &nbsp;&nbsp;<span class="arrow">┘</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│</div>
+        <div><span style="color:var(--faint)">hr</span> feed (joiners/leavers) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▼</div>
+        <div style="margin-top:8px;color:var(--fg)">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Rules R0–R10 · Access graph</b></div>
+        <div style="color:var(--fg)">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Blast-radius score · Half-life</b></div>
+      </div>
+      <ul class="clean" style="margin-top:26px">
+        <li><b>One identity, three providers, one sentence</b> <span>— the join is the reason the normaliser exists.</span></li>
+        <li><b>Scored by measured blast radius</b> <span>— reachable resources, not a hand-picked point value.</span></li>
+        <li><b>Time is the primary axis</b> <span>— drift is a rate, not a snapshot.</span></li>
+      </ul>
+    </div>
+    <div class="frame"><div class="bar"><i></i><i></i><i></i></div><img src="assets/overview.png" alt="Overview"/></div>
+  </div>
+  <div class="foot"><span class="mark"><span class="wordmark">ATHAR</span></span><span class="pageno">03</span></div>
+</section>
+
+<!-- 4 · DIFFERENTIATORS -->
+<section class="slide" data-note="Three things make this defensible rather than just another dashboard. One: the AI is fenced. The rule engine owns every decision, score and permitted action; a language model only explains findings and drafts remediation, and its proposals are checked against the rules before a human ever sees them. Two: every finding carries its evidence, at three altitudes — a headline for a director, an explanation for an analyst, and the raw provider JSON down to the escalation chain for an engineer. Three: every scan and every decision is committed to a Merkle-anchored ledger, so a report can be proven unedited without trusting us.">
+  <div class="kicker">Why it holds up</div>
+  <h2>Three things a dashboard doesn&rsquo;t give you.</h2>
+  <div class="grid" style="grid-template-columns:repeat(3,1fr);margin-top:40px">
+    <div class="panel"><div class="statlabel">01 · Control</div><h3 style="color:var(--cyan)">The AI is fenced</h3><p style="margin-top:10px">The rule engine decides. The model only explains and drafts. Proposals are validated against the rules before a human sees them — it cannot act outside the fence.</p></div>
+    <div class="panel"><div class="statlabel">02 · Evidence</div><h3 style="color:var(--cyan)">Three altitudes</h3><p style="margin-top:10px">Headline for a director. Explanation for an analyst. Raw provider JSON, score line-items and the escalation chain for an engineer. Every finding, every time.</p></div>
+    <div class="panel"><div class="statlabel">03 · Trust</div><h3 style="color:var(--cyan)">Verifiable ledger</h3><p style="margin-top:10px">Every scan and decision anchored to a Merkle root. A regulator recomputes it and checks the chain — proving a report is unedited without trusting us.</p></div>
+  </div>
+  <div class="panel" style="margin-top:24px;border-color:rgba(39,198,223,.35);background:var(--cyan-soft)">
+    <p style="color:var(--fg);font-size:17px"><b style="color:var(--cyan)">The through-line:</b> the engine is accountable, the finding is explainable, the record is verifiable. That is what a government regulator actually buys.</p>
+  </div>
+  <div class="foot"><span class="mark"><span class="wordmark">ATHAR</span></span><span class="pageno">04</span></div>
+</section>
+
+<!-- 5 · EVIDENCE / IDENTITY -->
+<section class="slide" data-note="This is the drill-down. One identity — a Platform Engineering account with a risk score of 100. The score is not asserted; it is a formula you can read: reach across seventy percent of the estate, a hundred and seventy-four resources reachable with control verbs, cross-cloud multiplier, capped at 100. Below it, the causal history: the exact grants, month by month, that moved the risk. This is the 'why', not just the 'what'.">
+  <div class="kicker">Evidence · drill-down</div>
+  <h2>A score you can read, line by line.</h2>
+  <div class="grid" style="grid-template-columns:.92fr 1.08fr;margin-top:26px;align-items:center">
+    <div>
+      <ul class="clean">
+        <li><b>Risk 100</b> <span>= reach 70% of estate × exploitability (cross-cloud +0.2) × controls — capped at 100.</span></li>
+        <li><b>Blast radius 69.9%</b> <span>— 174 resources reachable with control verbs, 87 high-sensitivity.</span></li>
+        <li><b>Causal history</b> <span>— the exact grants each month that moved the number.</span></li>
+        <li><b>R4 · Cross-cloud superuser</b> <span>— change and destroy in all three clouds.</span></li>
+      </ul>
+      <div style="display:flex;gap:10px;margin-top:22px">
+        <span class="tag t-crit">Critical · 100</span><span class="tag" style="background:var(--panel);color:var(--muted);border:1px solid var(--border-2)">Headline · Explanation · Evidence</span>
+      </div>
+    </div>
+    <div class="frame"><div class="bar"><i></i><i></i><i></i></div><img src="assets/identity-detail.png" alt="Identity drill-down"/></div>
+  </div>
+  <div class="foot"><span class="mark"><span class="wordmark">ATHAR</span></span><span class="pageno">05</span></div>
+</section>
+
+<!-- 6 · MEASURED -->
+<section class="slide" data-note="Is it correct? We measure it. On a held-out estate the scoring constants never saw, precision, recall and F1 are all perfect at high-and-above, and all eleven decoys — identities built to fool a naive scanner — are correctly left alone. But I want to be honest about what that number is: on synthetic data the ground truth comes from the same simulator, so this is a pipeline-recovery check, not a real-world accuracy claim. Which is exactly why we went and got real data.">
+  <div class="kicker">Measured, not asserted</div>
+  <h2>We test the detection. And we say what the test is.</h2>
+  <div class="grid" style="grid-template-columns:repeat(4,1fr);margin-top:34px">
+    <div class="panel"><div class="statlabel">Precision · High+</div><div class="stat cyan">1.00</div><div class="stathint">held-out seed 7 · tp 48 · fp 0</div></div>
+    <div class="panel"><div class="statlabel">Recall · High+</div><div class="stat cyan">1.00</div><div class="stathint">0 ground-truth positives missed</div></div>
+    <div class="panel"><div class="statlabel">Decoys handled</div><div class="stat cyan">11/11</div><div class="stathint">legitimacy only in the register</div></div>
+    <div class="panel"><div class="statlabel">Tuning seed 42</div><div class="stat">0.98</div><div class="stathint">F1 · constants tuned here, reported on 7</div></div>
+  </div>
+  <div class="panel" style="margin-top:26px;border-color:var(--border-2)">
+    <p style="color:var(--fg);font-size:16.5px"><b style="color:var(--cyan)">Said out loud:</b> on synthetic data the ground truth is written by the same simulator the exports come from — so a perfect score is a <b style="color:#fff">pipeline-recovery check</b>, not proof of real-world accuracy. Saying so is the point. So we ran it on real data.</p>
+  </div>
+  <div class="foot"><span class="mark"><span class="wordmark">ATHAR</span></span><span class="pageno">06</span></div>
+</section>
+
+<!-- 7 · REAL WORLD -->
+<section class="slide" data-note="We pointed ATHAR's own pipeline at a real AWS get-account-authorization-details export — a public, deliberately over-privileged estate. No changes to the engine. It parsed 122 real principals and produced 318 findings: seventeen wildcard-admin hits on genuinely administrative roles like OrganizationAccountAccessRole, seventy-three privilege-escalation findings on the real privesc roles. And here's the tell: R7, the peer-outlier rule, fires 36 times on real data — it fires on nothing in the synthetic estate, because real estates are lumpy and the generator was too uniform. A known limitation became a validated rule, on real data, live.">
+  <div class="kicker">Real-world validation · new</div>
+  <h2>Same engine. A real AWS export. It holds.</h2>
+  <div class="grid" style="grid-template-columns:1.02fr .98fr;margin-top:24px;align-items:center">
+    <div>
+      <div class="grid" style="grid-template-columns:1fr 1fr;gap:14px">
+        <div class="panel"><div class="statlabel">Findings</div><div class="stat cyan">318</div><div class="stathint">across 122 real principals</div></div>
+        <div class="panel"><div class="statlabel">R7 real vs synthetic</div><div class="stat cyan">36 <span style="color:var(--faint);font-size:22px">vs 0</span></div><div class="stathint">dead rule, alive on real data</div></div>
+      </div>
+      <ul class="clean" style="margin-top:20px">
+        <li><b>17 admin</b> <span>— OrganizationAccountAccessRole, AWSReservedSSO_Administrator…</span></li>
+        <li><b>73 privilege-escalation</b> <span>— privesc-sre-role, privesc-AssumeRole-ending-role.</span></li>
+        <li><b>No self-graded 1.00</b> <span>— real data has no ground truth; findings check against a known tool&rsquo;s own risky fixtures.</span></li>
+      </ul>
+    </div>
+    <div class="frame"><div class="bar"><i></i><i></i><i></i></div><img src="assets/realexport.png" alt="Real export"/></div>
+  </div>
+  <div class="foot"><span class="mark"><span class="wordmark">ATHAR</span></span><span class="pageno">07</span></div>
+</section>
+
+<!-- 8 · MCP -->
+<section class="slide" data-note="Adoption. Cyber-security teams do not want another dashboard to log into. So we exposed ATHAR over the Model Context Protocol. Any AI — Claude, a SOC copilot, an analyst's IDE — connects and asks: who can do what, why is identity X a 100, propose least-privilege for X. Every answer comes back deterministic and proof-bound from the engine. And the fence is enforced by the API's own roles, not by a prompt: nine tools, read-only plus one propose tool that still needs human approval. A viewer account can look, but is blocked from proposing — 403, requires analyst. The model can look and suggest. It can never decide or act.">
+  <div class="kicker">ATHAR-MCP · new</div>
+  <h2>Any AI can query it. None of them can decide.</h2>
+  <div class="grid" style="grid-template-columns:1fr 1fr;margin-top:30px">
+    <div class="panel">
+      <div class="seam"></div><h3>The adapter</h3>
+      <p style="margin-top:8px">Talks to ATHAR&rsquo;s own API, so it inherits every RBAC, evidence and ledger guarantee.</p>
+      <div class="mono" style="margin-top:16px;font-size:13px;line-height:1.9;color:var(--muted)">
+        <div><span style="color:var(--cyan)">read</span> · list_identities · explain_finding</div>
+        <div><span style="color:var(--cyan)">read</span> · estate_summary · department_halflife</div>
+        <div><span style="color:var(--cyan)">read</span> · evaluation · verify_scan</div>
+        <div><span style="color:var(--ok)">propose</span> · propose_remediation <span style="color:var(--faint)">(plan only)</span></div>
+        <div style="color:var(--crit)">✕ no approve · no apply · no writes</div>
+      </div>
+    </div>
+    <div class="panel" style="border-color:rgba(39,198,223,.35)">
+      <div class="seam"></div><h3>The fence, proven</h3>
+      <p style="margin-top:8px">Enforced by the API&rsquo;s roles, not a prompt.</p>
+      <div class="mono" style="margin-top:16px;font-size:13px;line-height:1.7;background:var(--panel-2);border:1px solid var(--border);border-radius:9px;padding:14px">
+        <div style="color:var(--ok)">analyst ▸ propose_remediation</div>
+        <div style="color:var(--muted)">&nbsp;&nbsp;→ plan: least-privilege · −12.8%</div>
+        <div style="margin-top:10px;color:var(--low)">viewer ▸ list_identities → ok</div>
+        <div style="color:var(--crit)">viewer ▸ propose_remediation</div>
+        <div style="color:var(--crit)">&nbsp;&nbsp;→ 403 requires role analyst</div>
+      </div>
+      <p style="margin-top:14px;color:var(--fg)"><b style="color:var(--cyan)">Look and suggest — never decide or act.</b></p>
+    </div>
+  </div>
+  <div class="foot"><span class="mark"><span class="wordmark">ATHAR</span></span><span class="pageno">08</span></div>
+</section>
+
+<!-- 9 · IT WORKS -->
+<section class="slide" data-note="And it works, end to end. One command builds and runs the whole thing in about ninety seconds — twelve months ingested, scanned, and anchored to the chain. Run it a second time and nothing duplicates. This is the timeline: a year of drift replayed, findings rising from 47 to 99, and permission half-life per department — a department reading 'Never' has a broken offboarding process, not twelve risky people. That is a process finding, not a to-do list.">
+  <div class="kicker">It runs · repeatably</div>
+  <h2>One command. Ninety seconds. Anchored.</h2>
+  <div class="grid" style="grid-template-columns:.9fr 1.1fr;margin-top:24px;align-items:center">
+    <div>
+      <div class="grid" style="grid-template-columns:1fr 1fr;gap:14px">
+        <div class="panel"><div class="statlabel">make demo</div><div class="stat cyan">~90s</div><div class="stathint">end to end · clean second run</div></div>
+        <div class="panel"><div class="statlabel">Scans anchored</div><div class="stat cyan">12</div><div class="stathint">one per month · on-chain</div></div>
+        <div class="panel"><div class="statlabel">Findings 1 → 12</div><div class="stat">47→99</div><div class="stathint">21 critical · 47 high</div></div>
+        <div class="panel"><div class="statlabel">Offboarding half-life</div><div class="stat crit">Never</div><div class="stathint">broken process, not risky people</div></div>
+      </div>
+    </div>
+    <div class="frame"><div class="bar"><i></i><i></i><i></i></div><img src="assets/timeline.png" alt="Timeline"/></div>
+  </div>
+  <div class="foot"><span class="mark"><span class="wordmark">ATHAR</span></span><span class="pageno">09</span></div>
+</section>
+
+<!-- 10 · FIT + ASK -->
+<section class="slide" data-note="Why this fits DESC. It is sovereign-deployable and data-residency aware. The AI is fenced. The record is independently verifiable — the property a regulator needs. It runs offline, on your own estate, and any tool you already use can query it over MCP without ever getting decision authority. What we want is one real government estate to point it at. Give us the exports; ATHAR gives you the record.">
+  <div class="kicker">Fit &amp; the ask</div>
+  <h2>Built for the room it&rsquo;s pitched in.</h2>
+  <div class="grid" style="grid-template-columns:repeat(3,1fr);margin-top:34px">
+    <div class="panel"><div class="seam"></div><h3>Sovereign</h3><p style="margin-top:8px">Runs offline, UAE-residency aware, control-mapped. No data leaves the estate.</p></div>
+    <div class="panel"><div class="seam"></div><h3>Accountable</h3><p style="margin-top:8px">Fenced AI, deterministic decisions, an audit record you can verify yourself.</p></div>
+    <div class="panel"><div class="seam"></div><h3>Adoptable</h3><p style="margin-top:8px">Your existing AI and tooling query it over MCP — no rip-and-replace.</p></div>
+  </div>
+  <div class="panel" style="margin-top:26px;border-color:rgba(39,198,223,.4);background:var(--cyan-soft);display:flex;align-items:center;gap:22px">
+    <div class="stat cyan" style="font-size:30px">The ask</div>
+    <div><h3 style="color:#fff">One real government estate to point it at.</h3><p style="margin-top:4px">Give us the exports — ATHAR gives you the record.</p></div>
+  </div>
+  <div class="foot"><span class="mark"><span class="wordmark">ATHAR</span></span><span class="pageno">10</span></div>
+</section>
+
+<!-- 11 · CLOSE -->
+<section class="slide" data-note="ATHAR. Every permission leaves a trace. Thank you — we'll take your questions.">
+  <div style="margin:auto 0;text-align:center;width:100%">
+    <div class="mark" style="justify-content:center;margin-bottom:26px">
+      <svg width="54" height="54" viewBox="0 0 24 24" fill="none"><circle cx="8" cy="12" r="2.4" fill="var(--cyan)"/><path d="M13 6.5a8 8 0 0 1 0 11" stroke="var(--cyan)" stroke-width="1.7" stroke-linecap="round" opacity=".85"/><path d="M16.5 4a12 12 0 0 1 0 16" stroke="var(--cyan)" stroke-width="1.7" stroke-linecap="round" opacity=".45"/></svg>
+    </div>
+    <div class="wordmark" style="font-size:30px">A T H A R</div>
+    <p class="lead" style="margin:20px auto 0;font-style:italic;color:var(--muted)">Every permission leaves a trace.</p>
+    <div style="display:flex;gap:12px;justify-content:center;margin-top:34px">
+      <span class="chip cyan">Live demo &amp; Q&amp;A</span><span class="chip">100 / 100 · case round</span>
+    </div>
+  </div>
+</section>
+
+</div></div>
+
+<div id="hint">← → to move · F fullscreen · P print / PDF · N speaker notes</div>
+<script>
+  const slides=[...document.querySelectorAll('.slide')];
+  let i=0;
+  function show(n){i=(n+slides.length)%slides.length;slides.forEach((s,k)=>s.classList.toggle('active',k===i));}
+  function fit(){const s=Math.min(innerWidth/1280,innerHeight/720);document.getElementById('stage').style.transform='scale('+s+')';}
+  addEventListener('resize',fit);fit();
+  addEventListener('keydown',e=>{
+    if(e.key==='ArrowRight'||e.key===' '||e.key==='PageDown'){show(i+1);}
+    else if(e.key==='ArrowLeft'||e.key==='PageUp'){show(i-1);}
+    else if(e.key==='Home'){show(0);}else if(e.key==='End'){show(slides.length-1);}
+    else if(e.key.toLowerCase()==='f'){document.documentElement.requestFullscreen?.();}
+    else if(e.key.toLowerCase()==='p'){window.print();}
+    else if(e.key.toLowerCase()==='n'){const n=slides[i].dataset.note||'';alert('Slide '+(i+1)+' — speaker notes:\n\n'+n);}
+    else if(e.key.toLowerCase()==='h'){document.getElementById('hint').classList.toggle('hide');}
+  });
+  addEventListener('click',e=>{if(e.target.closest('a'))return;show(i+ (e.clientX>innerWidth*0.35?1:-1));});
+  setTimeout(()=>document.getElementById('hint').classList.add('hide'),5000);
+</script>
+</body>
+</html>
