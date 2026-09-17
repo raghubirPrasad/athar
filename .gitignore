@@ -26,6 +26,9 @@ node_modules/
 frontend/dist/
 frontend/.vite/
 
+# rendered video output — regenerable via remotion
+video/out/
+
 # foundry — contracts/lib IS committed (no submodules), so `forge build` works on a clean clone
 /lib/
 contracts/out/
