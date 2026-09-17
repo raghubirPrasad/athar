@@ -19,11 +19,11 @@ export function Card({ title, subtitle, actions, children, className, flush = fa
     // min-content — which pushes the whole column, and the page, sideways on a
     // narrow screen. Zeroing it lets the card take the track it is given and
     // the panels inside it scroll on their own (`TableWrap`, `CodeBlock`).
-    <section id={id} className={cn("min-w-0 rounded-lg border border-border bg-surface shadow-card", className)}>
+    <section id={id} className={cn("min-w-0 rounded-md border border-border bg-surface shadow-card", className)}>
       {(title || actions) && (
-        <header className="flex items-start justify-between gap-3 border-b border-border px-4 py-2.5">
+        <header className="flex items-start justify-between gap-3 border-b border-border bg-surface-muted/40 px-4 py-3">
           <div className="min-w-0">
-            {title && <h2 className="truncate text-sm font-semibold text-fg">{title}</h2>}
+            {title && <h2 className="truncate text-[15px] font-medium text-fg">{title}</h2>}
             {subtitle && <p className="mt-0.5 text-[13px] text-fg-muted">{subtitle}</p>}
           </div>
           {actions && <div className="flex shrink-0 items-center gap-2">{actions}</div>}

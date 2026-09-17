@@ -17,7 +17,7 @@ export function PageHeader({ title, description, actions, meta, className }: Pag
   return (
     <header className={cn("flex flex-wrap items-start justify-between gap-3", className)}>
       <div className="min-w-0">
-        <h1 className="text-lg font-semibold leading-tight text-fg">{title}</h1>
+        <h1 className="text-[26px] font-light leading-tight tracking-tight text-fg">{title}</h1>
         {description && <p className="mt-1 max-w-3xl text-[13px] text-fg-muted">{description}</p>}
         {meta && <div className="mt-2 flex flex-wrap items-center gap-2">{meta}</div>}
       </div>

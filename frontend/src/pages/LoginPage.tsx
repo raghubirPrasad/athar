@@ -4,7 +4,8 @@ import { DEMO_ACCOUNTS } from "../auth/demoAccounts";
 import { redirectTarget } from "../auth/redirect";
 import { ROLE_LABEL } from "../auth/roles";
 import { useAuth } from "../auth/useAuth";
-import { APP_NAME } from "../branding";
+import { ORG_NAME, TAGLINE } from "../branding";
+import { Brandmark } from "../components/Brandmark";
 import { Button } from "../components/ui/Button";
 import { ErrorState } from "../components/ui/ErrorState";
 import { usePageTitle } from "../lib/usePageTitle";
@@ -38,15 +39,18 @@ export function LoginPage() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-bg p-4">
+    <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-bg p-4">
+      <div className="brand-rule absolute inset-x-0 top-0 h-[3px]" aria-hidden="true" />
       <div className="w-full max-w-sm">
-        <div className="mb-4 text-center">
-          <p className="text-xl font-semibold tracking-[0.18em] text-accent-strong">{APP_NAME}</p>
+        <div className="mb-5 flex flex-col items-center text-center">
+          <Brandmark size={40} />
+          <p className="mt-2.5 text-[24px] font-normal tracking-[0.3em] text-fg">ATHAR</p>
+          <p className="mt-1 text-[13px] italic text-fg-muted">{TAGLINE}</p>
         </div>
 
         <form
           onSubmit={onSubmit}
-          className="rounded-lg border border-border bg-surface p-4 shadow-card"
+          className="rounded-md border border-border bg-surface p-5 shadow-card"
           aria-labelledby="signin-heading"
         >
           <h1 id="signin-heading" className="text-sm font-semibold text-fg">
@@ -90,7 +94,7 @@ export function LoginPage() {
           </Button>
         </form>
 
-        <section className="mt-3 rounded-lg border border-dashed border-border-strong bg-surface p-3">
+        <section className="mt-3 rounded-md border border-dashed border-border-strong bg-surface p-3">
           <h2 className="text-xs font-semibold uppercase tracking-wide text-fg-muted">Demo accounts</h2>
           <ul className="mt-1.5 space-y-1">
             {DEMO_ACCOUNTS.map((account) => (
@@ -114,6 +118,8 @@ export function LoginPage() {
             <code>make demo</code>.
           </p>
         </section>
+
+        <p className="mt-4 text-center text-[11px] uppercase tracking-[0.16em] text-fg-faint">{ORG_NAME}</p>
       </div>
     </main>
   );

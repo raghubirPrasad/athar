@@ -12,6 +12,7 @@ import { LedgerPage } from "./pages/LedgerPage";
 import { LoginPage } from "./pages/LoginPage";
 import { NotFoundPage } from "./pages/NotFoundPage";
 import { OverviewPage } from "./pages/OverviewPage";
+import { RealExportPage } from "./pages/RealExportPage";
 import { RemediationPage } from "./pages/RemediationPage";
 import { SettingsPage } from "./pages/SettingsPage";
 import { TimelinePage } from "./pages/TimelinePage";
@@ -34,6 +35,7 @@ export function AppRoutes() {
           <Route path="ledger" element={<LedgerPage />} />
           <Route path="timeline" element={<TimelinePage />} />
           <Route path="evaluation" element={<EvaluationPage />} />
+          <Route path="real-export" element={<RealExportPage />} />
           <Route path="settings" element={<SettingsPage />} />
           <Route path="404" element={<NotFoundPage />} />
           <Route path="*" element={<NotFoundPage />} />

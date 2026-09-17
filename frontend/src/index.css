@@ -1,85 +1,75 @@
 @import "tailwindcss";
 
-/*
- * Design tokens. Calm, dense, audit-tool palette: neutral greys, one accent
- * (deep teal) and four severity tones. Severity tones are never the only
- * carrier of meaning — every SeverityBadge also has a text label and a glyph.
- * Light by default; dark follows prefers-color-scheme.
+/* ------------------------------------------------------------------ fonts
+ * Self-hosted so the look is identical on any machine (offline demo included).
+ * The sans stack lists Segoe UI first: on the Windows demo laptop it renders
+ * native Segoe (true Microsoft look); everywhere else it falls to IBM Plex Sans,
+ * an enterprise/infrastructure face that reads "serious security", never AI-slop.
+ * Mono is Cascadia (Microsoft's terminal font) — the SOC/dev-sec register.
+ */
+@font-face { font-family: "IBM Plex Sans"; font-weight: 300; font-style: normal; font-display: swap; src: url("/fonts/ibm-plex-sans-300.woff2") format("woff2"); }
+@font-face { font-family: "IBM Plex Sans"; font-weight: 400; font-style: normal; font-display: swap; src: url("/fonts/ibm-plex-sans-400.woff2") format("woff2"); }
+@font-face { font-family: "IBM Plex Sans"; font-weight: 500; font-style: normal; font-display: swap; src: url("/fonts/ibm-plex-sans-500.woff2") format("woff2"); }
+@font-face { font-family: "IBM Plex Sans"; font-weight: 600; font-style: normal; font-display: swap; src: url("/fonts/ibm-plex-sans-600.woff2") format("woff2"); }
+@font-face { font-family: "IBM Plex Sans"; font-weight: 700; font-style: normal; font-display: swap; src: url("/fonts/ibm-plex-sans-700.woff2") format("woff2"); }
+@font-face { font-family: "Cascadia Mono"; font-weight: 400; font-style: normal; font-display: swap; src: url("/fonts/cascadia-mono-400.woff2") format("woff2"); }
+@font-face { font-family: "Cascadia Mono"; font-weight: 600; font-style: normal; font-display: swap; src: url("/fonts/cascadia-mono-600.woff2") format("woff2"); }
+
+/* ------------------------------------------------------------------ tokens
+ * "Security console", light. Cool slate neutrals (no warmth — this is not a
+ * document, it is an operations surface), crisp white cards, one confident
+ * security blue, SOC-standard severity tones. Severity is never colour-only:
+ * every badge also carries a label and a glyph. Light only, forced.
  */
 :root {
-  color-scheme: light dark;
+  color-scheme: light;
 
-  --bg: #f6f7f8;
+  --bg: #eaeef3;            /* cool slate haze */
   --surface: #ffffff;
-  --surface-muted: #f1f3f4;
-  --border: #d9dee3;
-  --border-strong: #b9c2c9;
-  --fg: #1a1f24;
-  --fg-muted: #5b6770;
-  --fg-faint: #666f78;  /* 4.6:1 on --surface-muted, 5.1:1 on --surface (WCAG AA) */
+  --surface-muted: #eff3f8;
+  --border: #d6dde6;        /* cool hairline */
+  --border-strong: #b7c1cd;
+  --fg: #0e1622;            /* cool near-black */
+  --fg-muted: #47535f;
+  --fg-faint: #59636f;      /* AA on --surface and --surface-muted */
 
-  --accent: #0f766e;
-  --accent-strong: #115e59;
-  --accent-soft: #e6f4f2;
+  /* Content accent: a deep cyan that stays AA-legible on white cards (links, seams, buttons). */
+  --accent: #0b6f86;
+  --accent-strong: #0a5061;
+  --accent-soft: #e0f1f5;
   --accent-fg: #ffffff;
 
-  --sev-critical: #b42318;
-  --sev-critical-soft: #fde8e6;
-  --sev-high: #b54708;
-  --sev-high-soft: #fdeedd;
-  --sev-medium: #8a6a00;
-  --sev-medium-soft: #fbf3d0;
-  --sev-low: #175cd3;
-  --sev-low-soft: #e3edfb;
+  /* SOC chrome: graphite top bar + rail, with a bright electric-cyan accent that only ever
+     appears on the dark chrome (where it has the contrast to pop). */
+  --chrome: #12181f;
+  --chrome-2: #1b232d;
+  --chrome-fg: #e8eef4;
+  --chrome-fg-muted: #97a4b2;
+  --chrome-border: #263039;
+  --chrome-accent: #24c4dd;
+  --chrome-accent-soft: #16323b;
 
-  --ok: #067647;
-  --ok-soft: #e3f5ec;
-  --warn: #8a6a00;
-  --warn-soft: #fbf3d0;
-  --danger: #b42318;
-  --danger-soft: #fde8e6;
-  --danger-solid: #b42318;
+  --sev-critical: #b3261e;
+  --sev-critical-soft: #fbe7e5;
+  --sev-high: #b45309;
+  --sev-high-soft: #fbebdb;
+  --sev-medium: #8a6d1a;
+  --sev-medium-soft: #f7efd6;
+  --sev-low: #1d4ed8;
+  --sev-low-soft: #e6ecfb;
 
-  --focus: #0f766e;
-  --shadow: 0 1px 2px rgb(16 24 40 / 0.06), 0 1px 3px rgb(16 24 40 / 0.1);
-}
+  --ok: #12784a;
+  --ok-soft: #e2f2ea;
+  --warn: #8a6d1a;
+  --warn-soft: #f7efd6;
+  --danger: #b3261e;
+  --danger-soft: #fbe7e5;
+  --danger-solid: #b3261e;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #101417;
-    --surface: #171c21;
-    --surface-muted: #1f262c;
-    --border: #2b343c;
-    --border-strong: #3d4952;
-    --fg: #e6eaee;
-    --fg-muted: #9aa6b0;
-    --fg-faint: #85909a;  /* 4.7:1 on --surface-muted, 5.3:1 on --surface (WCAG AA) */
-
-    --accent: #2dd4bf;
-    --accent-strong: #5eead4;
-    --accent-soft: #113b38;
-    --accent-fg: #06211f;
-
-    --sev-critical: #f97066;
-    --sev-critical-soft: #3a1512;
-    --sev-high: #fdb022;
-    --sev-high-soft: #3b230a;
-    --sev-medium: #fde047;
-    --sev-medium-soft: #332c0a;
-    --sev-low: #84adff;
-    --sev-low-soft: #132548;
-
-    --ok: #4ade80;
-    --ok-soft: #0f2e1d;
-    --warn: #fde047;
-    --warn-soft: #332c0a;
-    --danger: #f97066;
-    --danger-soft: #3a1512;
-    --danger-solid: #d92d20;
-
-    --focus: #2dd4bf;
-    --shadow: 0 1px 2px rgb(0 0 0 / 0.4);
-  }
+  --focus: #0b5cad;
+  /* Cool, crisp — a console lift, not a soft webapp float. */
+  --shadow: 0 1px 2px rgb(13 22 38 / 0.06), 0 1px 3px rgb(13 22 38 / 0.09);
+  --shadow-raise: 0 2px 6px rgb(13 22 38 / 0.08), 0 10px 24px rgb(13 22 38 / 0.10);
 }
 
 /* Expose the tokens to Tailwind utilities (bg-surface, text-fg-muted, border-border …). */
@@ -96,6 +86,13 @@
   --color-accent-strong: var(--accent-strong);
   --color-accent-soft: var(--accent-soft);
   --color-accent-fg: var(--accent-fg);
+  --color-chrome: var(--chrome);
+  --color-chrome-2: var(--chrome-2);
+  --color-chrome-fg: var(--chrome-fg);
+  --color-chrome-fg-muted: var(--chrome-fg-muted);
+  --color-chrome-border: var(--chrome-border);
+  --color-chrome-accent: var(--chrome-accent);
+  --color-chrome-accent-soft: var(--chrome-accent-soft);
   --color-sev-critical: var(--sev-critical);
   --color-sev-critical-soft: var(--sev-critical-soft);
   --color-sev-high: var(--sev-high);
@@ -114,10 +111,9 @@
   --color-focus: var(--focus);
 
   --font-sans:
-    ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial,
-    "Noto Sans", sans-serif;
-  --font-mono:
-    ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", "Courier New", monospace;
+    "Segoe UI Variable Text", "Segoe UI", "IBM Plex Sans", -apple-system, BlinkMacSystemFont,
+    "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "Cascadia Mono", "Cascadia Code", Consolas, ui-monospace, Menlo, monospace;
 }
 
 @layer base {
@@ -127,10 +123,20 @@
     background: var(--bg);
     color: var(--fg);
     -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
   }
   body {
     margin: 0;
     min-height: 100vh;
+  }
+  /* Cyber-console register: large, lightweight headings (Wiz / CrowdStrike lineage). */
+  h1 {
+    font-weight: 300;
+    letter-spacing: -0.02em;
+  }
+  h2, h3 {
+    font-weight: 400;
+    letter-spacing: -0.014em;
   }
   :focus-visible {
     outline: 2px solid var(--focus);
@@ -143,7 +149,7 @@
   kbd,
   pre {
     font-family: var(--font-mono);
-    font-size: 0.925em;
+    font-size: 0.9em;
   }
 }
 
@@ -153,5 +159,17 @@
   }
   .shadow-card {
     box-shadow: var(--shadow);
+  }
+  .shadow-raise {
+    box-shadow: var(--shadow-raise);
+  }
+  /* The thin electric bar at the very top of the shell. */
+  .brand-rule {
+    background: linear-gradient(90deg, var(--accent), #1596b0 45%, var(--chrome-accent));
+  }
+  /* Dark SOC chrome: graphite surface + light text, used by the top bar and the rail. */
+  .chrome {
+    background: var(--chrome);
+    color: var(--chrome-fg);
   }
 }

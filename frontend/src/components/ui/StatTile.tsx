@@ -26,8 +26,11 @@ export interface StatTileProps {
 }
 
 const FRAME =
-  "group flex w-full flex-col gap-1 rounded-lg border border-border bg-surface px-4 py-3 text-left shadow-card";
-const INTERACTIVE = "cursor-pointer transition-colors hover:border-accent hover:bg-accent-soft/40";
+  "group relative flex w-full flex-col gap-1.5 overflow-hidden rounded-md border border-border bg-surface px-4 py-3.5 text-left shadow-card";
+const INTERACTIVE =
+  "cursor-pointer transition-all hover:border-accent hover:bg-accent-soft/30 hover:shadow-raise";
+/** A hairline accent seam along the top edge — the small mark of a considered dashboard. */
+const SEAM = "before:absolute before:inset-x-0 before:top-0 before:h-[2px] before:bg-accent/70 before:content-['']";
 
 /**
  * KPI tile. PRD §8.2: every number is a link to its evidence — pass `to` or
@@ -40,24 +43,24 @@ export function StatTile({ label, value, hint, tone = "neutral", icon, to, onCli
         {label}
         {icon && <span aria-hidden="true" className="text-fg-faint">{icon}</span>}
       </span>
-      <span className={cn("tabular text-2xl font-semibold leading-tight", VALUE_TONE[tone])}>{value}</span>
+      <span className={cn("tabular text-[30px] font-light leading-none tracking-tight", VALUE_TONE[tone])}>{value}</span>
       {hint && <span className="text-[13px] text-fg-muted group-hover:text-fg">{hint}</span>}
     </>
   );
 
   if (to) {
     return (
-      <Link to={to} className={cn(FRAME, INTERACTIVE, className)}>
+      <Link to={to} className={cn(FRAME, SEAM, INTERACTIVE, className)}>
         {body}
       </Link>
     );
   }
   if (onClick) {
     return (
-      <button type="button" onClick={onClick} className={cn(FRAME, INTERACTIVE, className)}>
+      <button type="button" onClick={onClick} className={cn(FRAME, SEAM, INTERACTIVE, className)}>
         {body}
       </button>
     );
   }
-  return <div className={cn(FRAME, className)}>{body}</div>;
+  return <div className={cn(FRAME, SEAM, className)}>{body}</div>;
 }
